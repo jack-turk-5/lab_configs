@@ -6,4 +6,4 @@
 - Need to create directories `~/.config/containers/volumes/wireguard/` and `~/.config/systemd/user/`
 - Make sure lingering is enabled (see `../podman/setup.md`)
 - Reload systemd user daemon `systemctl --user daemon-reload`
-- Manually start container
+- Manually start container `systemctl --user start wireguard`
