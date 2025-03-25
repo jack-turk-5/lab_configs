@@ -22,7 +22,7 @@ Environment=WG_HOST=vpn.jackturk.dev
 Environment=WG_ALLOWED_IPS=0.0.0.0/0
 Environment=WG_PERSISTENT_KEEPALIVE=25
 Environment=WG_DEFAULT_DNS=8.8.8.8, 8.8.4.4
-Environment=WG_MTU=1420
+# Environment=WG_MTU=1420
 # Remove once HTTPS configured
 Environment=INSECURE=true
 
