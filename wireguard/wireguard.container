@@ -21,7 +21,8 @@ Sysctl=net.ipv4.conf.all.src_valid_mark=1
 Environment=WG_HOST=vpn.jackturk.dev
 # Remove once HTTPS configured
 Environment=INSECURE=true
-Environment=DISABLE_IPTABLES=true
+Environment=WG_POST_UP="iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o tap+ -j MASQUERADE; iptables -A INPUT -p udp --dport 51820 -j ACCEPT; iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A PREROUTING -p tcp -i tap+ -m multiport '!' --dports 22,51821 -j DNAT --to-destination 10.8.0.2; iptables -t nat -A PREROUTING -p udp -i tap+ '!' --dport 51820 -j DNAT --to-destination 10.8.0.2;"
+Environment=WG_POST_DOWN="iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o tap+ -j MASQUERADE; iptables -D INPUT -p udp --dport 51820 -j ACCEPT; iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D PREROUTING -p tcp -i tap+ -m multiport '!' --dports 22,51821 -j DNAT --to-destination 10.8.0.2; iptables -t nat -D PREROUTING -p udp -i tap+ '!' --dport 51820 -j DNAT --to-destination 10.8.0.2;"
 
 [Service]
 Restart=always
