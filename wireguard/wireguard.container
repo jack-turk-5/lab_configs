@@ -27,7 +27,7 @@ Environment=WG_POST_DOWN=iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o eth0 -
 
 [Service]
 Restart=always
-# EnvironmentFile=/home/podman/.config/containers/systemd/env/wg.env
+EnvironmentFile=/home/podman/.config/containers/systemd/env/wg.env
 
 [Install]
 WantedBy=default.target
