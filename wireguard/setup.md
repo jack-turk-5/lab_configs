@@ -7,3 +7,4 @@
 - Make sure lingering is enabled (see `../podman/setup.md`)
 - Reload systemd user daemon `systemctl --user daemon-reload`
 - Manually start container `systemctl --user start wireguard`
+- Run `podman run --rm -it ghcr.io/wg-easy/wg-easy wgpw <password>` once to obtain passwork hash and put result in `~/.config/containers/systemd/env/wg.env`
