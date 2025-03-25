@@ -22,16 +22,8 @@ Sysctl=net.ipv4.conf.all.src_valid_mark=1
 Environment=WG_HOST=vpn.jackturk.dev
 # Remove once HTTPS configured
 Environment=INSECURE=true
-Environment=WG_POST_UP="\
-iptables -t nat -I POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE; \
-iptables -I FORWARD -i wg0 -o eth0 -j ACCEPT; \
-iptables -I FORWARD -i eth0 -o wg0 -j ACCEPT; \
-iptables -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT"
-Environment=WG_POST_DOWN="\
-iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE; \
-iptables -D FORWARD -i wg0 -o eth0 -j ACCEPT; \
-iptables -D FORWARD -i eth0 -o wg0 -j ACCEPT; \
-iptables -D FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT"
+Environment=WG_POST_UP=iptables -t nat -I POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE; iptables -I FORWARD -i wg0 -o eth0 -j ACCEPT; iptables -I FORWARD -i eth0 -o wg0 -j ACCEPT; iptables -I FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+Environment=WG_POST_DOWN=iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE; iptables -D FORWARD -i wg0 -o eth0 -j ACCEPT; iptables -D FORWARD -i eth0 -o wg0 -j ACCEPT; iptables -D FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
 
 [Service]
 Restart=always
