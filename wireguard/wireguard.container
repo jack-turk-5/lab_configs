@@ -21,6 +21,7 @@ Sysctl=net.ipv4.conf.all.src_valid_mark=1
 Environment=WG_HOST=vpn.jackturk.dev
 # Remove once HTTPS configured
 Environment=INSECURE=true
+Environment=DISABLE_IPTABLES=true
 
 [Service]
 Restart=always
