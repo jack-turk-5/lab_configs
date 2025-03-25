@@ -1,5 +1,5 @@
 [Unit]
-Requires=network-online.target
+Wants=network-online.target
 After=iptables-firewall.service network-online.target
 
 [Container]
