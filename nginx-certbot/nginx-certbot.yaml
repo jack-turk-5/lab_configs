@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-web-pod
+spec:
+  containers:
+    - name: nginx
+      image: localhost/nginx-rootless:latest
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+      ports:
+        - containerPort: 8080
+        - containerPort: 8443
+      volumeMounts:
+        - name: letsencrypt-data
+          mountPath: /etc/letsencrypt
+        - name: webroot-data
+          mountPath: /var/www/certbot
+
+    - name: certbot
+      image: localhost/certbot-rootless:latest
+      securityContext:
+        runAsUser: 2000
+        runAsGroup: 2000
+      volumeMounts:
+        - name: letsencrypt-data
+          mountPath: /etc/letsencrypt
+        - name: webroot-data
+          mountPath: /var/www/certbot
+
+  volumes:
+    - name: letsencrypt-data
+      hostPath:
+        path: /path/on/host/letsencrypt
+    - name: webroot-data
+      hostPath:
+        path: /path/on/host/www

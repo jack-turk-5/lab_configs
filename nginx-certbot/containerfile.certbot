@@ -1,0 +1,15 @@
+FROM certbot/certbot:latest
+
+# Create a non-root user for certbot
+RUN addgroup --system certbotgroup && adduser --system --ingroup certbotgroup certbotuser
+
+# Make sure the /etc/letsencrypt directory (and the webroot) is writable by certbotuser
+RUN mkdir -p /etc/letsencrypt /var/www/certbot \
+ && chown -R certbotuser:certbotgroup /etc/letsencrypt /var/www/certbot
+
+USER certbotuser
+
+COPY entrypoint_certbot.sh /entrypoint_certbot.sh
+RUN chmod +x /entrypoint_certbot.sh
+
+CMD ["/entrypoint_certbot.sh"]
