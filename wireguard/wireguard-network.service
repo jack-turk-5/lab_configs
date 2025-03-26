@@ -1,13 +1,11 @@
 [Unit]
-Description=WireGuard Bridge Network
+Description=Create Podman WireGuard Bridge Network
 After=network-online.target
-Wants=network-online.target
 
-[Network]
-# Name of the network as referenced by containers
-Name=wireguard-network
-Driver=bridge
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/podman network create --subnet 10.8.0.0/24 wireguard-network
+RemainAfterExit=yes
 
-# Define the subnet and gateway for the VPN network
-Subnets=10.8.0.0/24
-Gateway=10.8.0.1
+[Install]
+WantedBy=default.target
