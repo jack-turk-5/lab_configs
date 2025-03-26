@@ -1,5 +1,5 @@
 [Unit]
-Description=wireguard Bridge Network
+Description=WireGuard Bridge Network
 
 [Network]
 # Name of the network as referenced by containers
