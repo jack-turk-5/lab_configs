@@ -1,5 +1,7 @@
 [Unit]
 Description=WireGuard Bridge Network
+After=network-online.target
+Wants=network-online.target
 
 [Network]
 # Name of the network as referenced by containers
