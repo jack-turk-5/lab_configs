@@ -7,4 +7,6 @@
 export XDG_RUNTIME_DIR=/run/user/$(id -u)
 export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
 ```
-- Run sudo loginctl enable-linger <username> 
+- Run sudo loginctl enable-linger <username> for both root and user(s)
+- Copy systemwide `containers.conf` to `/etc/containers/`
+- Restart system
