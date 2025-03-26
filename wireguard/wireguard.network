@@ -1,0 +1,11 @@
+[Unit]
+Description=wireguard Bridge Network
+
+[Network]
+# Name of the network as referenced by containers
+Name=wireguard-network
+Driver=bridge
+
+# Define the subnet and gateway for the VPN network
+Subnets=10.8.0.0/24
+Gateway=10.8.0.1
