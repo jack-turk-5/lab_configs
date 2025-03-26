@@ -6,9 +6,8 @@ After=iptables-firewall.service network-online.target
 ContainerName=wireguard
 Image=ghcr.io/wg-easy/wg-easy:latest
 AutoUpdate=registry
-
+NetworkMode=pasta
 Volume=/home/podman/.config/containers/volumes/wireguard:/etc/wireguard:Z
-NetworkMode=host
 
 AddCapability=NET_ADMIN
 AddCapability=NET_RAW
