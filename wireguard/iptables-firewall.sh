@@ -10,9 +10,8 @@ iptables -A INPUT -p tcp --dport 51821 -j ACCEPT
 # Allow established and related connections in FORWARD
 iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 
-# NAT rule for VPN client traffic from the 10.8.0.0/24 subnet out via ens5
-iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o ens5 -j MASQUERADE
+# (No MASQUERADE rules; rely on pasta's default NAT)
 
-# Allow forwarding for the VPN client subnet
+# Optionally, allow forwarding for the VPN client subnet if desired
 iptables -A FORWARD -s 10.8.0.0/24 -j ACCEPT
 iptables -A FORWARD -d 10.8.0.0/24 -j ACCEPT

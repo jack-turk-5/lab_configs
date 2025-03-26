@@ -4,7 +4,7 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/podman network create --subnet 10.8.0.0/24 wireguard-network
+ExecStart=/usr/bin/podman network create --driver bridge --subnet 10.8.0.0/24 wireguard-network
 RemainAfterExit=yes
 
 [Install]
