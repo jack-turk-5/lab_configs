@@ -12,4 +12,5 @@
 - Copy `iptables.conf` to `/etc/modules-load.d/` so that the necessary modules autoload
 - Copy `iptables-firewall.sh` to `/usr/local/bin/` and ensure it is executable
 - Copy `iptables-firewall.service` to `/etc/systemd/system/` so that firewall rules are automatically applied
+- Copy `10-bridge.conf` to `/etc/cni/net.d/`
 - Restart system
