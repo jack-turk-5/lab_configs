@@ -1,8 +1,8 @@
 [Unit]
-Wants=network-online.target wireguard-network.service
-After=iptables-firewall.service network-online.target wireguard-network.service
-# Wants=network-online.target
-# After=iptables-firewall.service network-online.target
+# Wants=network-online.target wireguard-network.service
+# After=iptables-firewall.service network-online.target wireguard-network.service
+Wants=network-online.target
+After=iptables-firewall.service network-online.target
 
 [Container]
 ContainerName=wireguard
