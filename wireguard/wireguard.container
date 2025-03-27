@@ -1,6 +1,6 @@
 [Unit]
-Wants=network-online.target
-After=iptables-firewall.service network-online.target
+Wants=network-online.target podman-wireguard.service
+After=iptables-firewall.service network-online.target podman-wireguard.service
 
 [Container]
 ContainerName=wireguard
