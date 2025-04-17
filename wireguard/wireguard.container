@@ -7,7 +7,7 @@ Restart=always
 [Container]
 ContainerName=wireguard
 Image=ghcr.io/wg-easy/wg-easy:latest
-Network=pasta:--map-gw
+Network=pasta:--map-gw,--masq
 Volume=wireguard-config:/etc/wireguard:Z
 PublishPort=51820:51820/udp
 PublishPort=51821:51821/tcp
@@ -24,8 +24,8 @@ Environment=WG_HOST=vpn.jackturk.dev
 Environment=WG_ALLOWED_IPS=0.0.0.0/0,::/0
 Environment=WG_PERSISTENT_KEEPALIVE=25
 Environment=WG_DEFAULT_DNS=1.1.1.1,1.0.0.1
-Environment="WG_POST_UP=iptables -I FORWARD -i wg0 -d 172.26.0.0/24,172.26.15.0/24 -j REJECT; iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j SNAT --to-source 3.15.122.25;"
-Environment="WG_POST_DOWN=iptables -D FORWARD -i wg0 -d 172.26.0.0/24,172.26.15.0/24 -j REJECT; iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j SNAT --to-source 3.15.122.25;"
+Environment="WG_POST_UP=iptables -I FORWARD -i wg0 -d 172.26.0.0/24,172.26.15.0/24 -j REJECT;"
+Environment="WG_POST_DOWN=iptables -D FORWARD -i wg0 -d 172.26.0.0/24,172.26.15.0/24 -j REJECT;"
 Environment=INSECURE=true
 Environment=UI_TRAFFIC_STATS=true
 Environment=UI_CHART_TYPE=2
