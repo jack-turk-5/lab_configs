@@ -32,8 +32,7 @@ Environment=WG_DEFAULT_DNS=8.8.8.8,8.8.4.4
 Environment=INSECURE=true
 Environment=UI_TRAFFIC_STATS=true
 Environment=UI_CHART_TYPE=2
-Environment=WG_PRE_UP=iptables -A INPUT -p tcp --dport 22 -s 3.15.122.25 -j ACCEPT
-Environment=WG_POST_UP=iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source 3.15.122.25
+Environment=WG_POST_UP=iptables -t nat -A POSTROUTING -o ens5  $(ip route show default | awk '/default/ {print $5; exit}') -j SNAT --to-source 3.15.122.25
 
 [Install]
 WantedBy=default.target
