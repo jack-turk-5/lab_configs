@@ -4,7 +4,8 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/podman network create --driver bridge --subnet 10.8.0.0/24 wireguard-network
+# The inline script checks if the network exists; if not, it creates it.
+ExecStart=/bin/bash -c 'podman network inspect wireguard-network >/dev/null 2>&1 || podman network create --driver bridge --subnet 10.8.0.0/24 wireguard-network'
 RemainAfterExit=yes
 
 [Install]
