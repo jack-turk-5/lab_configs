@@ -8,7 +8,7 @@ ContainerName=wireguard
 Image=ghcr.io/wg-easy/wg-easy:latest
 
 # Use rootless user‑mode NAT for Internet egress
-Network=pasta:-i,ens5,-u,51820:51820,-t,51821:51821
+Network=pasta:-i,ens5,--map-gw,-u,51820:51820,-t,51821:51821
 
 # (Optional) If you hit MTU-related stalls:
 # Network=slirp4netns:mtu=1500:allow_host_loopback=true
