@@ -18,3 +18,11 @@ network_backend = "netavark"
 ```
 - Copy `podman-wireguard.service` to `/etc/systemd/system/`
 - Restart system
+
+
+# Not 100% rootless :(
+slirp4netns is NAT‑only: By design, slirp4netns (the default rootless network mode) masquerades egress but does not support inbound DNAT for UDP, so published ports bind only on 127.0.0.1 and aren’t reachable externally
+
+Pasta defaults to no NAT: Since Podman 5.0, Pasta replaced slirp4netns as the default rootless CNI but still offers only outbound masquerading when invoked with port‑mapping flags (-t), not a full routing table for inbound UDP
+
+No UDP in systemd‑socket‑proxyd: Even systemd’s socket proxy can’t help directly—systemd‑socket‑proxyd supports only stream sockets (TCP) and lacks UDP datagram forwarding
