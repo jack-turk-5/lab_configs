@@ -1,29 +1,25 @@
 [Unit]
-Description=WireGuard (wg‑easy) via pasta (rootless)
+Description=WireGuard (wg‑easy) via Pasta (rootless)
 Wants=network-online.target
 After=network-online.target
+Restart=always
 
 [Container]
 ContainerName=wireguard
 Image=ghcr.io/wg-easy/wg-easy:latest
 
-# Use rootless user‑mode NAT for Internet egress
-Network=pasta:--map-gw:-i,ens5:-u,51820:51820:-t,51821:51821
+Network=pasta:--map-gw,--interface=ens5,--udp-ports=51820:51820,--tcp-ports=51821:51821
 
-# WireGuard volume & ports
 Volume=wireguard-config:/etc/wireguard:Z
 
-# Capabilities
 AddCapability=NET_ADMIN
 AddCapability=NET_RAW
 DropCapability=MKNOD
 DropCapability=AUDIT_WRITE
 
-# In‑container forwarding
 Sysctl=net.ipv4.ip_forward=1
 Sysctl=net.ipv4.conf.all.src_valid_mark=1
 
-# WireGuard environment
 Environment=WG_HOST=vpn.jackturk.dev
 Environment=WG_ALLOWED_IPS=0.0.0.0/0,::/0
 Environment=WG_PERSISTENT_KEEPALIVE=25
