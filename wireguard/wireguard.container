@@ -7,8 +7,7 @@ ContainerName=wireguard
 Image=ghcr.io/wg-easy/wg-easy:latest
 
 # Attach to pasta network
-Network=pasta
-PodmanArgs=--map-gw
+Network=pasta:--map-gw
 
 # WireGuard volume & ports
 Volume=wireguard-config:/etc/wireguard:Z
