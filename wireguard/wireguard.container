@@ -1,30 +1,31 @@
 [Unit]
 Wants=network-online.target
+Restart=always
 
 [Container]
 ContainerName=wireguard
 Image=ghcr.io/wg-easy/wg-easy:latest
-Restart=always
 
-# Attach to pasta rootless network and enable host-reachability
-Network=pasta:--map-gw
+# Attach to pasta network
+Network=pasta
+PodmanArgs=--map-gw
 
-# WireGuard volume and service port
+# WireGuard volume & ports
 Volume=wireguard-config:/etc/wireguard:Z
 PublishPort=51820:51820/udp
 PublishPort=51821:51821/tcp
 
-# Permissions for iptables inside the user namespace
+# Capabilities
 AddCapability=NET_ADMIN
 AddCapability=NET_RAW
 DropCapability=MKNOD
 DropCapability=AUDIT_WRITE
 
-# Enable IP forwarding in the container
+# Sysctls
 Sysctl=net.ipv4.ip_forward=1
 Sysctl=net.ipv4.conf.all.src_valid_mark=1
 
-# WireGuard host & DNS config via environment
+# Environment
 Environment=WG_HOST=vpn.jackturk.dev
 Environment=WG_ALLOWED_IPS=0.0.0.0/0,::/0
 Environment=WG_PERSISTENT_KEEPALIVE=25
@@ -32,7 +33,6 @@ Environment=WG_DEFAULT_DNS=8.8.8.8,8.8.4.4
 Environment=INSECURE=true
 Environment=UI_TRAFFIC_STATS=true
 Environment=UI_CHART_TYPE=2
-Environment=WG_POST_UP=iptables -t nat -A POSTROUTING -o ens5  $(ip route show default | awk '/default/ {print $5; exit}') -j SNAT --to-source 3.15.122.25
 
 [Install]
 WantedBy=default.target
