@@ -1,5 +1,5 @@
 [Unit]
-Description=WireGuard (wg‑easy) via slirp4netns (rootless)
+Description=WireGuard (wg‑easy) via pasta (rootless)
 Wants=network-online.target
 After=network-online.target
 
@@ -8,7 +8,7 @@ ContainerName=wireguard
 Image=ghcr.io/wg-easy/wg-easy:latest
 
 # Use rootless user‑mode NAT for Internet egress
-Network=pasta
+Network=pasta:--map-gw:-i,ens5:-u,51820:51820:-t,51821:51821
 
 # WireGuard volume & ports
 Volume=wireguard-config:/etc/wireguard:Z
