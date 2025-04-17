@@ -1,5 +1,5 @@
 [Unit]
-Description=WireGuard Outbound-Forwarding (Rootless)
+Wants=network-online.target
 
 [Container]
 ContainerName=wireguard
