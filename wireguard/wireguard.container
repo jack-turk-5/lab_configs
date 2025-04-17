@@ -1,13 +1,18 @@
 [Unit]
+Description=WireGuard (wg‑easy) via slirp4netns (rootless)
 Wants=network-online.target
+After=network-online.target
 Restart=always
 
 [Container]
 ContainerName=wireguard
 Image=ghcr.io/wg-easy/wg-easy:latest
 
-# Attach to pasta network
-# Network=pasta:--map-gw
+# Use rootless user‑mode NAT for Internet egress
+Network=slirp4netns:allow_host_loopback=true
+
+# (Optional) If you hit MTU-related stalls:
+# Network=slirp4netns:mtu=1500:allow_host_loopback=true
 
 # WireGuard volume & ports
 Volume=wireguard-config:/etc/wireguard:Z
@@ -20,11 +25,11 @@ AddCapability=NET_RAW
 DropCapability=MKNOD
 DropCapability=AUDIT_WRITE
 
-# Sysctls
+# In‑container forwarding
 Sysctl=net.ipv4.ip_forward=1
 Sysctl=net.ipv4.conf.all.src_valid_mark=1
 
-# Environment
+# WireGuard environment
 Environment=WG_HOST=vpn.jackturk.dev
 Environment=WG_ALLOWED_IPS=0.0.0.0/0,::/0
 Environment=WG_PERSISTENT_KEEPALIVE=25
