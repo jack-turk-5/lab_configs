@@ -1,3 +1,0 @@
-[Network]
-Driver=slirp4netns
-DriverOpts=port_handler=rootlesskit,outbound_addr=wg0,allow_host_loopback=true,enable_ipv6=false
