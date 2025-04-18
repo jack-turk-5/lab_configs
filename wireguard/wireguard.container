@@ -7,8 +7,9 @@ Restart=always
 [Container]
 ContainerName=wireguard
 Image=ghcr.io/wg-easy/wg-easy:latest
-Network=vpn.network
-Slirp4netnsExtraOptions=--port=51820:51820/udp,--port=51821:51821/tcp
+Network=slirp4netns:port_handler=rootlesskit,outbound_addr=wg0,allow_host_loopback=true,enable_ipv6=false
+PublishPort=51820:51820/udp
+PublishPort=51821:51821/tcp
 Volume=wireguard-config:/etc/wireguard:Z
 
 AddCapability=NET_ADMIN
