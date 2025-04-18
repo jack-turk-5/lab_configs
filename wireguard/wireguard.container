@@ -22,8 +22,8 @@ Environment=WG_HOST=vpn.jackturk.dev
 Environment=WG_ALLOWED_IPS=0.0.0.0/0,::/0
 Environment=WG_PERSISTENT_KEEPALIVE=25
 Environment=WG_DEFAULT_DNS=1.1.1.1,1.0.0.1
-Environment="WG_POST_UP=iptables -I FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT;iptables -I FORWARD -i wg0 -o tap+ -j ACCEPT;iptables -I FORWARD -i wg0 -d 172.26.0.0/24,172.26.15.0/24 -j REJECT;iptables -t nat -A PREROUTING -p tcp --dport 51821 -j REDIRECT --to-port 443;iptables -t nat -A POSTROUTING -o tap+ -j MASQUERADE;"
-Environment="WG_POST_DOWN=iptables -D FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT;iptables -D FORWARD -i wg0 -o tap+ -j ACCEPT;iptables -D FORWARD -i wg0 -d 172.26.0.0/24,172.26.15.0/24 -j REJECT;iptables -t nat -A PREROUTING -p tcp --dport 51821 -j REDIRECT --to-port 443;iptables -t nat -D POSTROUTING -o tap+ -j MASQUERADE;"
+Environment="WG_POST_UP=iptables -I FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT;iptables -I FORWARD -i wg0 -o tap+ -j ACCEPT;iptables -I FORWARD -i wg0 -d 172.26.0.0/24,172.26.15.0/24 -j REJECT;iptables -t nat -A POSTROUTING -o tap+ -j MASQUERADE;"
+Environment="WG_POST_DOWN=iptables -D FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT;iptables -D FORWARD -i wg0 -o tap+ -j ACCEPT;iptables -D FORWARD -i wg0 -d 172.26.0.0/24,172.26.15.0/24 -j REJECT;iptables -t nat -D POSTROUTING -o tap+ -j MASQUERADE;"
 Environment=UI_TRAFFIC_STATS=true
 Environment=UI_CHART_TYPE=2
 
