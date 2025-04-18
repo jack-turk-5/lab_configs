@@ -1,6 +1,5 @@
 [Unit]
 Description=Rootless Reverse Proxy via Caddy
-Requires=network-online.target
 Wants=wireguard.service network-online.target
 After=wireguard.service network-online.target
 Restart=always
