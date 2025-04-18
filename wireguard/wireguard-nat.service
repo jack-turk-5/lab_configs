@@ -5,8 +5,8 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/sbin/iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j SNAT --to-source 3.15.122.25
-ExecStop=/usr/sbin/iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o eth0 -j SNAT --to-source 3.15.122.25
+ExecStart=/usr/sbin/iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o ens5 -j MASQUERADE
+ExecStop=/usr/sbin/iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o ens5 -j MASQUERADE
 RemainAfterExit=yes
 
 # Lock down the service to only what it needs
