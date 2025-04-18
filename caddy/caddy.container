@@ -1,5 +1,6 @@
 [Unit]
 Description=Rootless Reverse Proxy via Caddy
+Requires=network-online.target
 Wants=wireguard.service network-online.target
 After=wireguard.service network-online.target
 Restart=always
@@ -10,7 +11,7 @@ Image=docker.io/caddy:latest
 Network=slirp4netns:mtu=1500,port_handler=slirp4netns,allow_host_loopback=true,enable_ipv6=false
 PublishPort=80:80/tcp
 PublishPort=443:443/tcp
-Volume=/home/podman/lab_configs/caddy/Caddyfile:/etc/caddy:Z
+Volume=/home/podman/lab_configs/caddy/Caddyfile:/etc/caddy/Caddyfile:Z
 Volume=caddy-data:/data:Z
 Command=caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
 
