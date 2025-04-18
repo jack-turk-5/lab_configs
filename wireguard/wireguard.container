@@ -7,7 +7,7 @@ Restart=always
 [Container]
 ContainerName=wireguard
 Image=ghcr.io/wg-easy/wg-easy:latest
-Network=slirp4netns:port_handler=rootlesskit,outbound_addr=wg0,allow_host_loopback=true,enable_ipv6=false
+Network=slirp4netns:port_handler=slirp4netns,outbound_addr=wg0,allow_host_loopback=true,enable_ipv6=false
 PublishPort=51820:51820/udp
 PublishPort=51821:51821/tcp
 Volume=wireguard-config:/etc/wireguard:Z
