@@ -1,5 +1,3 @@
 [Network]
 Driver=slirp4netns
 DriverOpts=port_handler=rootlesskit,outbound_addr=wg0,allow_host_loopback=true,enable_ipv6=false,port=51820:51820/udp,port=51821:51821/tcp
-[Install]
-WantedBy=network.target
