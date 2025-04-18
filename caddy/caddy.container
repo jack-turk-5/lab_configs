@@ -13,7 +13,7 @@ PublishPort=80:80/tcp
 PublishPort=443:443/tcp
 Volume=/home/podman/lab_configs/caddy/Caddyfile:/etc/caddy/Caddyfile:Z
 Volume=caddy-data:/data:Z
-Command=caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+Exec=run --config /etc/caddy/Caddyfile --adapter caddyfile
 
 [Install]
 WantedBy=default.target
