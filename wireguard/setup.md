@@ -1,10 +1,9 @@
 ## Instructions for running WireGuard as a Systemd container with Rootless Podman, Slirp4netns, and WG-Easy
 
-- Based loosely on [Using WireGuard Easy with Rootless Podman](https://github.com/wg-easy/wg-easy/wiki/Using-WireGuard-Easy-with-rootless-Podman-%28incl.-Kubernetes-yaml-file-generation%29)
 
 #### Root Tasks
 - Create a file `/etc/modules-load.d/wg-easy.conf` with the following content:
-```
+```bash
 wireguard
 nft_masq
 ip_tables
@@ -21,7 +20,7 @@ xt_MASQUERADE
 - Manually start container `systemctl --user start wireguard`
 
 #### Iptables For Outside Internet VPN
-```
+```bash
 WG_POST_UP=
 # Accept return traffic for established connections
 iptables -I FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT;
