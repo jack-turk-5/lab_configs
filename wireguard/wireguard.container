@@ -9,7 +9,7 @@ ContainerName=wireguard
 Image=ghcr.io/wg-easy/wg-easy:latest
 Network=slirp4netns:mtu=1500,port_handler=slirp4netns,allow_host_loopback=true,enable_ipv6=false
 PublishPort=51820:51820/udp
-PublishPort=127.0.0.1:51821:51821/tcp
+PublishPort=51821:51821/tcp
 Volume=wireguard-config:/etc/wireguard:Z
 
 AddCapability=NET_ADMIN NET_RAW SYS_MODULE
