@@ -1,11 +1,3 @@
-[Unit]
-Description=VPN Pasta network with gateway mapping
-Wants=network-online.target
-After=network-online.target
-
 [Network]
 Driver=pasta
 DriverOpts=map-gw
-
-[Install]
-WantedBy=multi-user.target

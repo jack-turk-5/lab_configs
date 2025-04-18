@@ -1,7 +1,7 @@
 [Unit]
 Description=WireGuard (wg‑easy) via Pasta (rootless)
-Wants=vpn.network
-After=vpn.network
+Wants=vpn-network.service
+After=vpn-network.service
 Restart=always
 
 [Container]
