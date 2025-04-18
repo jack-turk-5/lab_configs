@@ -1,3 +1,7 @@
+http://vpn.jackturk.dev {
+    redir https://vpn.jackturk.dev{uri} 308
+}
+
 vpn.jackturk.dev {
     reverse_proxy http://host.containers.internal:51821
     encode gzip
