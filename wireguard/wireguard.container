@@ -1,7 +1,7 @@
 [Unit]
 Description=WireGuard (wg‑easy) via Slirp (rootless)
-Wants=vpn.network
-After=vpn.network
+Wants=network-online.target
+After=network-online.target
 Restart=always
 
 [Container]
