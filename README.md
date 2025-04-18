@@ -6,3 +6,4 @@ An opinionated set of instructions, containerfiles, and scripts that I use to se
 # Future Services
 - [Remote desktop access with RustDesk](https://rustdesk.com/)
 - [Self-Hosted git/artifactory with gitea](https://about.gitea.com/)
+- [VaultWarden Password Manager] (https://github.com/dani-garcia/vaultwarden)
