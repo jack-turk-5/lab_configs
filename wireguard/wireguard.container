@@ -7,7 +7,7 @@ Restart=always
 [Container]
 ContainerName=wireguard
 Image=ghcr.io/wg-easy/wg-easy:latest
-Network=wg-slirp
+Network=vpn.network
 Volume=wireguard-config:/etc/wireguard:Z
 
 AddCapability=NET_ADMIN
