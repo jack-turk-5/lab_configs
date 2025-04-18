@@ -1,0 +1,4 @@
+vpn.jackturk.dev {
+    reverse_proxy http://[::1]:51821
+    encode gzip
+}
