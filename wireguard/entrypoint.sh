@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-# FD 3 = UDP for WireGuard
-# FD 4 = TCP for the UI
-systemd-socket-activate --fdname=3 wg-quick up wg0
-systemd-socket-activate --fdname=4 node server.js
+# Podman/Conmon hands in exactly 2 sockets: FD 3 (UDP dual‑stack) & FD 4 (TCP dual‑stack)
+socat -u FD:3 UDP:[::1]:51820,reuseaddr &
+socat FD:4 TCP-LISTEN:51821,reuseaddr,fork &
+exec "$@"
