@@ -3,6 +3,7 @@ Description=Forgejo UI HTTP Socket
 
 [Socket]
 ListenStream=3000
+Service=forgejo.service
 
 [Install]
 WantedBy=sockets.target

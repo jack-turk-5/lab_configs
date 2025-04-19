@@ -3,6 +3,7 @@ Description=WireGuard UI HTTP Socket
 
 [Socket]
 ListenStream=51821
+Service=wireguard.service
 
 [Install]
 WantedBy=sockets.target

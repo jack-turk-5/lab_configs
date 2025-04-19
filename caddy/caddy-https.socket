@@ -3,6 +3,7 @@ Description=Caddy HTTPS Socket
 
 [Socket]
 ListenStream=443
+Service=caddy.service
 
 [Install]
 WantedBy=sockets.target
