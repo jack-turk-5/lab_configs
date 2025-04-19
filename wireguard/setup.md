@@ -17,7 +17,7 @@ xt_MASQUERADE
 #### User Tasks
 - Socket and network go under `~/.config/systemd/user/`
 - `wireguard.container` goes under `~/.config/containers/systemd/`
-- Build Containerfile with `podman build -t localhost/WireGuard/wg-custom:latest`
+- Build Containerfile with `podman build -t localhost/wireguard/wg-custom:latest .`
 - Make sure lingering is enabled (see `../podman/setup.md`)
 - Reload systemctl user daemon `systemctl --user daemon-reload`
 - Manually enable the sockets `systemctl --user enable --now wireguard.socket`
