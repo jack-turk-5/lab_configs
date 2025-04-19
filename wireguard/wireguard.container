@@ -5,7 +5,7 @@ After=wireguard.socket
 
 [Container]
 ContainerName=wireguard
-Image=localhost/WireGuard/wg-custom:latest
+Image=localhost/wireguard/wg-custom:latest
 Network=none
 Volume=wireguard-config:/etc/wireguard:Z
 
