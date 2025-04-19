@@ -1,17 +1,17 @@
 http://vpn.jackturk.dev {
-    redir 127.0.0.1:51821{uri} 308
+    redir 51821{uri} 308
 }
 
 vpn.jackturk.dev {
-    reverse_proxy 127.0.0.1:51821
+    reverse_proxy 51821
     encode gzip
 }
 
 http://forgejo.jackturk.dev {
-    redir 127.0.0.1:3000{uri} 308
+    redir 3000{uri} 308
 }
 
 forgejo.jackturk.dev {
-    reverse_proxy 127.0.0.1:3000
+    reverse_proxy 3000
     encode gzip
 }
