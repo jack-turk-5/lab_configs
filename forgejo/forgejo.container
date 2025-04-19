@@ -1,7 +1,7 @@
 [Unit]
 Description=Forgejo via Rootless Sockets (VCS)
-Wants=network-online.target
-After=network-online.target
+Requires=forgejo-ui.socket forgejo-ssh.socket
+After=forgejo-ui.socket forgejo-ssh.socket
 Restart=always
 SocketActivated=yes
 
@@ -11,8 +11,6 @@ Environment=USER_UID=1001
 Environment=USER_GID=1001
 Image=codeberg.org/forgejo/forgejo:10
 Network=none
-Socket=forgejo-ssh.socket
-Socket=forgejo-ui.socket
 Volume=forgejo-data:/data
 
 [Service]

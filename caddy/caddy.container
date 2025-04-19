@@ -1,6 +1,6 @@
 [Unit]
 Description=Rootless Reverse Proxy via Caddy
-Wants=wireguard.service forgejo.service network-online.target
+Requires=caddy-http.socket caddy-https.socket
 After=wireguard.service forgejo.service network-online.target
 Restart=always
 SocketActivated=yes
@@ -9,8 +9,6 @@ SocketActivated=yes
 ContainerName=caddy
 Image=docker.io/caddy:latest
 Network=none
-Socket=caddy-http.socket
-Socket=caddy-https.socket
 Volume=/home/podman/lab_configs/caddy/Caddyfile:/etc/caddy/Caddyfile:Z
 Volume=caddy-data:/data:Z
 Exec=caddy run --config /etc/caddy/Caddyfile --adapter caddyfile

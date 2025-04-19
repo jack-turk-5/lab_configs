@@ -1,7 +1,7 @@
 [Unit]
 Description=WireGuard (wg‑easy) via Rootless Sockets
-Wants=network-online.target
-After=network-online.target
+Wants=wireguard-udp.socket wireguard-ui.socket
+After=wireguard-udp.socket wireguard-ui.socket
 Restart=always
 SocketActivated=yes
 
