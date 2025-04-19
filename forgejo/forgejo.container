@@ -1,7 +1,7 @@
 [Unit]
 Description=Forgejo via Rootless Sockets (VCS)
-Requires=forgejo-ui.socket forgejo-ssh.socket
-After=forgejo-ui.socket forgejo-ssh.socket
+Requires=forgejo.socket
+After=forgejo.socket forgejo.socket
 
 [Container]
 ContainerName=forgejo
