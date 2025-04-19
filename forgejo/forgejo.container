@@ -3,6 +3,7 @@ Description=Forgejo via Rootless Sockets (VCS)
 Wants=network-online.target
 After=network-online.target
 Restart=always
+SocketActivated=yes
 
 [Container]
 ContainerName=forgejo

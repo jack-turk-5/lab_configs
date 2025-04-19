@@ -3,6 +3,7 @@ Description=Rootless Reverse Proxy via Caddy
 Wants=wireguard.service forgejo.service network-online.target
 After=wireguard.service forgejo.service network-online.target
 Restart=always
+SocketActivated=yes
 
 [Container]
 ContainerName=caddy

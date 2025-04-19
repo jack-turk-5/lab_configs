@@ -2,7 +2,7 @@
 Description=WireGuard UI HTTP Socket
 
 [Socket]
-ListenStream=3.15.122.25:51821
+ListenStream=51821
 
 [Install]
 WantedBy=sockets.target

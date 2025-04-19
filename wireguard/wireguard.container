@@ -3,6 +3,7 @@ Description=WireGuard (wg‑easy) via Rootless Sockets
 Wants=network-online.target
 After=network-online.target
 Restart=always
+SocketActivated=yes
 
 [Container]
 ContainerName=wireguard

@@ -2,7 +2,7 @@
 Description=Caddy HTTPS Socket
 
 [Socket]
-ListenStream=3.15.122.25:443
+ListenStream=443
 
 [Install]
 WantedBy=sockets.target
