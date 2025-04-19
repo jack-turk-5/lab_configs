@@ -1,5 +1,4 @@
-## Instructions for running WireGuard as a Systemd container with Rootless Podman, Slirp4netns, and WG-Easy
-
+## Instructions for running WireGuard as a Systemd container with Rootless Podman, Sockets, and WG-Easy
 
 #### Root Tasks
 - Create a file `/etc/modules-load.d/wg-easy.conf` with the following content:
@@ -14,9 +13,11 @@ xt_MASQUERADE
 - Reload root daemon `sudo systemctl daemon-reload`
 
 #### User Tasks
+- Sockets go under `~/.config/systemd/user/`
 - Containerfile goes under `~/.config/containers/systemd/`
 - Make sure lingering is enabled (see `../podman/setup.md`)
-- Reload systemd user daemon `systemctl --user daemon-reload`
+- Reload systemctl user daemon `systemctl --user daemon-reload`
+- Manually enable the sockets `systemctl --user enable --now wireguard-udp.socket wireguard-ui.socket`
 - Manually start container `systemctl --user start wireguard`
 
 #### Iptables For Outside Internet VPN

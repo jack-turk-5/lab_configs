@@ -1,0 +1,9 @@
+[Unit]
+Description=WireGuard UDP Socket (rootless)
+
+[Socket]
+ListenDatagram=3.15.122.25:51820
+Multicast=false
+
+[Install]
+WantedBy=sockets.target
