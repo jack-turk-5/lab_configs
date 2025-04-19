@@ -2,8 +2,6 @@
 Description=Forgejo via Rootless Sockets (VCS)
 Requires=forgejo-ui.socket forgejo-ssh.socket
 After=forgejo-ui.socket forgejo-ssh.socket
-Restart=always
-SocketActivated=yes
 
 [Container]
 ContainerName=forgejo
