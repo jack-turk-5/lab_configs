@@ -10,14 +10,17 @@ iptable_filter
 iptable_nat
 xt_MASQUERADE
 ```
+- Copy `wireguard-iptables.service`to `/etc/systemd/system/wireguard-iptables.service`
 - Reload root daemon `sudo systemctl daemon-reload`
+- Activate the wireguard iptables root service with `sudo systemctl enable --now wireguard-iptables.service`
 
 #### User Tasks
-- Sockets go under `~/.config/systemd/user/`
-- Containerfile goes under `~/.config/containers/systemd/`
+- Socket and network go under `~/.config/systemd/user/`
+- `wireguard.container` goes under `~/.config/containers/systemd/`
+- Build Containerfile with `podman build -t localhost/WireGuard/wg-custom:latest`
 - Make sure lingering is enabled (see `../podman/setup.md`)
 - Reload systemctl user daemon `systemctl --user daemon-reload`
-- Manually enable the sockets `systemctl --user enable --now wireguard-udp.socket wireguard-ui.socket`
+- Manually enable the sockets `systemctl --user enable --now wireguard.socket`
 - Manually start container `systemctl --user start wireguard`
 
 #### Iptables For Outside Internet VPN

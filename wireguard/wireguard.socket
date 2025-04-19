@@ -1,0 +1,12 @@
+[Unit]
+Description=WireGuard Socket (rootless)
+
+[Socket]
+BindIPv6Only=both
+ListenDatagram=[::]:51820
+ListenStream=[::]:51821
+Multicast=false
+Service=wireguard.service
+
+[Install]
+WantedBy=sockets.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=Forgejo Socket (Rootless)
+
+[Socket]
+BindIPv6Only=both
+ListenStream=[::]:222
+ListenStream=[::]:3000
+Service=forgejo.service
+
+[Install]
+WantedBy=sockets.target

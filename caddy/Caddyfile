@@ -1,17 +1,39 @@
+{
+  admin fd/6
+}
+
 http://vpn.jackturk.dev {
-    redir 51821{uri} 308
+  bind fd/3 {
+    protocols h1
+  }
+  redir https://vpn.jackturk.dev{uri} permanent
 }
 
-vpn.jackturk.dev {
-    reverse_proxy 51821
-    encode gzip
+https://vpn.jackturk.dev {
+  bind fd/4 {
+    protocols h1 h2
+  }
+  bind fdgram/5 {
+    protocols h3
+  }
+  reverse_proxy 127.0.0.1:51821
+  encode gzip
 }
 
-http://forgejo.jackturk.dev {
-    redir 3000{uri} 308
+http://forge.jackturk.dev {
+  bind fd/3 {
+    protocols h1
+  }
+  redir https://forge.jackturk.dev{uri} permanent
 }
 
-forgejo.jackturk.dev {
-    reverse_proxy 3000
-    encode gzip
+https://forge.jackturk.dev {
+  bind fd/4 {
+    protocols h1 h2
+  }
+  bind fdgram/5 {
+    protocols h3
+  }
+  reverse_proxy 127.0.0.1:3000
+  encode gzip
 }
