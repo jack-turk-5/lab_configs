@@ -7,7 +7,7 @@ After=forgejo.socket ssh.service
 ContainerName=forgejo
 Environment=USER_UID=1001
 Environment=USER_GID=1001
-Image=codeberg.org/forgejo/forgejo:10
+Image=codeberg.org/forgejo/forgejo:11
 Network=none
 Volume=forgejo-data:/data
 

@@ -1,5 +1,6 @@
+## Setup UFW and IpTables for Firewall
 
-## Host Tasks
+#### Host Tasks
 - `WARNING!` Before touching network settings over ssh run `sudo ufw allow 22/tcp comment 'Allow SSH access'` so you don't get locked out
 - Uncomment `net/ipv4/ip_forward=1` in `/etc/ufw/sysctl.conf`
 - Uncomment `net.ipv4.ip_forward=1` in `/etc/sysctl.conf`
