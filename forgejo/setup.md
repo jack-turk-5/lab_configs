@@ -1,8 +1,9 @@
 ## Instructions for running Forgejo for VCS/Artifactory with Rootless Podman and Sockets
 
 #### Root Tasks
-- Allow SSH on 222
+- Allow SSH on 222 (make sure `Port 22` is explicitly written out before this in the file)
 ```bash
+# Port 22 # Often commented out, amke sure it is present first
 Port 222
 PermitRootLogin no
 PasswordAuthentication no
@@ -12,9 +13,12 @@ PubkeyAuthentication yes
 
 -  Delegate to Forgejo for authenticating git SSH requests
 ```bash
-Match User git
-  AllowTCPForwarding no
+Match LocalPort 222
+  AllowUsers git
+  PermitRootLogin no
+  PasswordAuthentication no
   X11Forwarding no
+  AllowTcpForwarding no
   ForceCommand /usr/local/bin/gitea keys -e git -u %u -t %t -k %k
   AuthorizedKeysCommand /usr/local/bin/gitea keys -e git -u %u -t %t -k %k
   AuthorizedKeysCommandUser git
