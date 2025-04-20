@@ -12,7 +12,8 @@ Network=none
 Volume=forgejo-data:/data
 
 Environment=START_SSH_SERVER=true
-Environment=SSH_LISTEN_PORT=2222
+Environment=SSH_PORT=222
+Environment=SSH_LISTEN_PORT=222
 
 [Service]
 Restart=always
