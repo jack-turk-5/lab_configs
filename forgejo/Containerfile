@@ -1,7 +1,7 @@
 FROM codeberg.org/forgejo/forgejo:10-rootless
 USER root
 RUN apk add --no-cache socat
-USER 1000:1000
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
+USER 1000:1000
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
