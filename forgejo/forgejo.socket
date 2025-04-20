@@ -2,9 +2,9 @@
 Description=Forgejo Socket (Rootless)
 
 [Socket]
-BindIPv6Only=both
 ListenStream=[::]:222
 ListenStream=[::]:3000
+BindIPv6Only=both
 Service=forgejo.service
 
 [Install]

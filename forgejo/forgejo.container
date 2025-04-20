@@ -7,9 +7,12 @@ After=forgejo.socket forgejo.socket
 ContainerName=forgejo
 Environment=USER_UID=1001
 Environment=USER_GID=1001
-Image=codeberg.org/forgejo/forgejo:10
+Image=localhost/forgejo/forgejo-custom:latest
 Network=none
 Volume=forgejo-data:/data
+
+Environment=START_SSH_SERVER=true
+Environment=SSH_LISTEN_PORT=22
 
 [Service]
 Restart=always

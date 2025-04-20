@@ -1,0 +1,5 @@
+FROM codeberg.org/forgejo/forgejo:10-rootless
+RUN apk add --no-cache socat
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
