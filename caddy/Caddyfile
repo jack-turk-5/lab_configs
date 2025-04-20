@@ -34,11 +34,6 @@ https://forge.jackturk.dev {
   bind fdgram/5 {
     protocols h3
   }
-  reverse_proxy host.containers.internal:3000 {
-    health_path /install
-    health_interval 5s
-    health_timeout 2s
-    health_failures 5
-  }
+  reverse_proxy host.containers.internal:3000
   encode gzip
 }
