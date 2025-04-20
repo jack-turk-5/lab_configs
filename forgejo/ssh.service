@@ -1,0 +1,10 @@
+[Unit]
+Description=SSHD via Rootless Socket on 222
+Requires=forgejo.socket
+After=ssh-forgejo.socket
+
+[Service]
+ExecStart=/usr/sbin/sshd -D -p 222
+
+[Install]
+WantedBy=default.target

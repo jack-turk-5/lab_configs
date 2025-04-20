@@ -1,13 +1,13 @@
 [Unit]
 Description=Forgejo via Rootless Sockets (VCS)
-Requires=forgejo.socket
-After=forgejo.socket forgejo.socket
+Requires=forgejo.socket ssh.service
+After=forgejo.socket ssh.service
 
 [Container]
 ContainerName=forgejo
 Environment=USER_UID=1001
 Environment=USER_GID=1001
-Image=localhost/forgejo/forgejo-custom:latest
+Image=codeberg.org/forgejo/forgejo:10
 Network=none
 Volume=forgejo-data:/data
 
