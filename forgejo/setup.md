@@ -8,26 +8,41 @@ Port 222
 PermitRootLogin no
 PasswordAuthentication no
 PubkeyAuthentication yes
-
 ```
 
 -  Delegate to Forgejo for authenticating git SSH requests by adding the following to `/etc/ssh/sshd_config`
 ```bash
 Match LocalPort 222
   AllowUsers git
-  AuthorizedKeysCommand /usr/local/bin/gitea keys -e git -u %u -t %t -k %k
+  AuthorizedKeysCommand /usr/local/bin/git-ssh-keys %f %k
   AuthorizedKeysCommandUser root
-  ForceCommand         /usr/local/bin/gitea keys -e git -u %u -t %t -k %k
-  AllowTcpForwarding   no
-  X11Forwarding        no
+  ForceCommand /usr/local/bin/git-ssh-keys %f %k
+  AllowTcpForwarding no
+  X11Forwarding no
 ```
-- Download Gitea CLI so that ssh keys can be validated
+- Stop here to start Forgejo and create user git-ssh in Forgejo
+- Add a file to hold git-ssh user login token
+```bash
+sudo mkdir -p /etc/forgejo
+sudo nano /etc/forgejo/git-ssh # Copy access token for git-ssh to this file
+sudo chown root:root /etc/forgejo/git-ssh
+sudo chmod 0400 /etc/forgejo/git-ssh # Make file readonly
 ```
-wget -O gitea https://github.com/go-gitea/gitea/releases/download/v1.23.4/gitea-1.23.4-linux-amd64
-chmod +x gitea
-sudo mv gitea /usr/local/bin/
-sudo chown root:root /usr/local/bin/gitea
-sudo chmod 0755   /usr/local/bin/gitea
+- Copy `git-ssh-keys` to `/usr/local/bin/git-ssh-keys`
+```bash
+sudo chown root:root /usr/local/bin/git-ssh-keys
+ sudo chmod 0755 /usr/local/bin/git-ssh-keys # Make executable
+```
+- Add a minimally scoped git user to facilitate SSH
+```bash
+sudo mkdir -p /var/lib/git
+sudo chown git:git /var/lib/git
+sudo chmod 0755 /var/lib/git
+sudo adduser --system \
+            --group \
+            --home /var/lib/git \
+            --shell /usr/sbin/nologin \
+            git
 ```
 
 #### User Tasks

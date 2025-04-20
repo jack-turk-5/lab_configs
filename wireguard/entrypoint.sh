@@ -1,12 +1,12 @@
-#!/bin/sh
+#!/usr/bin/env sh
 set -e
 
-# 1) Bring up your WireGuard interface
+# 1) Bring up WireGuard
 wg-quick up wg0
 
-# 2) Start socket proxies in the background
+# 2) Only socket‑activate the UDP path into FD 3:
+#    Listen on UDP 51820, fork, hand datagrams into FD 3
 socat UDP-LISTEN:51820,reuseaddr,fork FD:3 &
-socat TCP-LISTEN:[::]:51821,reuseaddr,fork FD:4 &
 
-# 3) Finally exec the UI, inheriting FDs 3 & 4
+# 3) Exec the UI (inherits FD 4 untouched)
 exec node server.js
