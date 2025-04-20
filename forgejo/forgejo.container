@@ -11,8 +11,8 @@ Image=codeberg.org/forgejo/forgejo:10
 Network=none
 Volume=forgejo-data:/data
 
-Environment=START_SSH_SERVER=true
-Environment=SSH_PORT=2222
+Environment=DISABLE_SSH=true
+Environment=START_SSH_SERVER=false
 Environment=SSH_LISTEN_PORT=222
 
 [Service]
