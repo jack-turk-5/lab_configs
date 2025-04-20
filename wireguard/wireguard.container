@@ -6,7 +6,7 @@ After=wireguard.socket
 [Container]
 ContainerName=wireguard
 Image=localhost/wireguard/wg-custom:latest
-Network=wireguard.network
+Network=slirp4netns:mtu=1440,port_handler=slirp4netns,allow_host_loopback=true
 PublishPort=51821:51821
 Volume=wireguard-config:/etc/wireguard:Z
 
