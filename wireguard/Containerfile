@@ -24,7 +24,7 @@ RUN gcc -O2 -static -s shim.c wireguard.c \
 # Stage 2: Final (wg-easy base)
 # ────────────────
 FROM ghcr.io/wg-easy/wg-easy:latest
-
+RUN apk add --no-cache socat iproute2
 # Copy statically‑linked shim
 COPY --from=builder /usr/local/bin/wg-shim /usr/local/bin/wg-shim
 
