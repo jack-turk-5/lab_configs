@@ -8,19 +8,20 @@
 #include <errno.h>
 #include <poll.h>
 #include <sys/ioctl.h>
-#include <net/if.h>              // struct ifreq, IFF_* flags 
-#include <linux/if_tun.h>        // TUNSETIFF, IFF_TUN, IFF_NO_PI 
-#include "wireguard.h"           // embeddable‑wg‑library API 
+#include <net/if.h>              // struct ifreq, IFF_* flags :contentReference[oaicite:0]{index=0}
+#include <linux/if_tun.h>        // TUNSETIFF, IFF_TUN, IFF_NO_PI :contentReference[oaicite:1]{index=1}
+#include "wireguard.h"           // embeddable‑wg‑library API :contentReference[oaicite:2]{index=2}
 
 #define TUN_DEV    "/dev/net/tun"
 #define IFACE      "wg0"
 #define BUF_SIZE   65536
 
-// 1) Parse systemd socket activation: require LISTEN_FDS ≥1, return FD 3
+// 1) Parse systemd socket activation (LISTEN_FDS ≥1) → FD 3 :contentReference[oaicite:3]{index=3}
 static int parse_activation(void) {
     char *e = getenv("LISTEN_FDS");
     int fds = e ? atoi(e) : 0;
-    unsetenv("LISTEN_FDS"); unsetenv("LISTEN_PID");
+    unsetenv("LISTEN_FDS");
+    unsetenv("LISTEN_PID");
     if (fds < 1) {
         fprintf(stderr, "ERROR: No socket activated (LISTEN_FDS=%d)\n", fds);
         return -1;
@@ -28,24 +29,24 @@ static int parse_activation(void) {
     return 3;
 }
 
-// 2) Create wg0 idempotently (ignore EEXIST)
+// 2) Create wg0 idempotently (ignore EEXIST) :contentReference[oaicite:4]{index=4}
 static int create_device(void) {
-    int r = wg_add_device(IFACE);                  // ip link add wg0 type wireguard :contentReference[oaicite:2]{index=2}
+    int r = wg_add_device(IFACE);                  
     int err = errno;
-    if (r != 0 && err != EEXIST) {                  // only fatal on unexpected errors 
+    if (r != 0 && err != EEXIST) {
         fprintf(stderr, "ERROR: wg_add_device failed (%s)\n", strerror(err));
         return -1;
     }
-    fprintf(stderr, "[DEBUG] %s %s\n", IFACE, r==0? "created":"already exists");
+    fprintf(stderr, "[DEBUG] %s %s\n", IFACE, r == 0 ? "created" : "already exists");
     return 0;
 }
 
-// 3) Strip helper directives and apply config
+// 3) Strip unsupported lines and apply config via wg-quick | wg setconf :contentReference[oaicite:5]{index=5}
 static int apply_config(void) {
     char cmd[256];
     snprintf(cmd, sizeof(cmd),
-        "wg-quick strip %s | wg setconf %s -", IFACE, IFACE);
-    int rc = system(cmd);                          // pipeline via shell :contentReference[oaicite:3]{index=3}
+             "wg-quick strip " IFACE " | wg setconf " IFACE " -");
+    int rc = system(cmd);  
     if (rc != 0) {
         fprintf(stderr, "ERROR: wg setconf returned %d\n", rc);
         return -1;
@@ -54,12 +55,12 @@ static int apply_config(void) {
     return 0;
 }
 
-// 4) Bring interface up at L2/L3
+// 4) Bring up wg0 at L2/L3 
 static void setup_link(void) {
-    system("ip link set up dev " IFACE);           // bring wg0 up 
+    system("ip link set up dev " IFACE);
 }
 
-// 5) Open TUN device for packet I/O
+// 5) Open the TUN device for packet I/O :contentReference[oaicite:6]{index=6}
 static int open_tun(const char *name) {
     struct ifreq ifr = {0};
     int fd = open(TUN_DEV, O_RDWR);
@@ -76,22 +77,19 @@ static int open_tun(const char *name) {
 }
 
 int main(void) {
-    // Acquire UDP socket (FD 3) via systemd
     int udp_fd = parse_activation();
     if (udp_fd < 0) return EXIT_FAILURE;
 
-    // Create & configure WireGuard interface
     if (create_device() < 0) return EXIT_FAILURE;
     if (apply_config() < 0)   return EXIT_FAILURE;
     setup_link();
 
-    // Open TUN after wg0 exists
     int tun_fd = open_tun(IFACE);
 
-    // 6) Bidirectional proxy: TUN ↔ UDP using poll()
+    // 6) Proxy loop: TUN ↔ UDP using poll() 
     struct pollfd fds[2] = {
         { .fd = tun_fd, .events = POLLIN },
-        { .fd = udp_fd,  .events = POLLIN }
+        { .fd = udp_fd , .events = POLLIN }
     };
     unsigned char buf[BUF_SIZE];
     while (1) {
@@ -101,11 +99,13 @@ int main(void) {
         }
         if (fds[0].revents & POLLIN) {
             ssize_t n = read(tun_fd, buf, BUF_SIZE);
-            if (n > 0 && send(udp_fd, buf, n, 0) < 0) perror("send udp");
+            if (n > 0 && send(udp_fd, buf, n, 0) < 0)
+                perror("send udp");
         }
         if (fds[1].revents & POLLIN) {
             ssize_t n = recv(udp_fd, buf, BUF_SIZE, 0);
-            if (n > 0 && write(tun_fd, buf, n) < 0) perror("write tun");
+            if (n > 0 && write(tun_fd, buf, n) < 0)
+                perror("write tun");
         }
     }
 
