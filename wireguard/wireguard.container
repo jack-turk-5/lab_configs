@@ -7,6 +7,7 @@ After=wireguard-udp.socket wireguard-ui.socket
 ContainerName=wireguard
 Image=localhost/wireguard/wg-custom:latest
 Network=none
+Mount=type=bind,source=/lib/modules,target=/lib/modules,readonly
 Volume=wireguard-config:/etc/wireguard:Z
 
 AddDevice=/dev/net/tun:/dev/net/tun:rwm
