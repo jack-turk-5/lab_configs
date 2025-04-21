@@ -4,7 +4,6 @@
   admin   fd/6
 }
 
-# single HTTP → HTTPS redirect on port 80 (fd 3)
 http://vpn.jackturk.dev forge.jackturk.dev {
   bind fd/3 {
     protocols h1
@@ -12,7 +11,6 @@ http://vpn.jackturk.dev forge.jackturk.dev {
   redir https://{host}{uri} permanent
 }
 
-# single HTTPS server on fd 4 (TCP/443) + fdgram 5 (UDP/443) for h3
 https://vpn.jackturk.dev forge.jackturk.dev {
   bind       fd/4 { 
     protocols h1 h2 
@@ -22,8 +20,7 @@ https://vpn.jackturk.dev forge.jackturk.dev {
   }
   encode     gzip
 
-  # route by hostname
-  @vpn   host vpn.jackturk.dev
+  @vpn host vpn.jackturk.dev
   handle @vpn {
     reverse_proxy host.containers.internal:51821
   }

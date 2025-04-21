@@ -11,8 +11,6 @@ Image=codeberg.org/forgejo/forgejo:11
 Network=none
 Volume=forgejo-data:/data
 
-Environment=SSH_CREATE_AUTHORIZED_KEYS_FILE=false
-
 [Service]
 Restart=always
 
