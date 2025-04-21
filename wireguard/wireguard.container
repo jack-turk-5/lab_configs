@@ -1,13 +1,12 @@
 [Unit]
 Description=WireGuard (wg‑easy) via Rootless Sockets
-Requires=wireguard.socket
-After=wireguard.socket
+Requires=wireguard-udp.socket wireguard-ui.socket
+After=wireguard-udp.socket wireguard-ui.socket
 
 [Container]
 ContainerName=wireguard
 Image=localhost/wireguard/wg-custom:latest
-Network=wireguard.network
-PublishPort=51820:51820/udp
+Network=none
 Volume=wireguard-config:/etc/wireguard:Z
 
 AddCapability=NET_ADMIN NET_RAW SYS_MODULE

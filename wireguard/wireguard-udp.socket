@@ -1,8 +1,8 @@
 [Unit]
-Description=WireGuard Socket (Rootless)
+Description=WireGuard Socket for UDP (Rootless)
 
 [Socket]
-ListenStream=[::]:51821
+ListenDatagram=[::]:51820
 BindIPv6Only=both
 SocketMode=0600
 Service=wireguard.service
