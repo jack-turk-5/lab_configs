@@ -3,15 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <poll.h>
 #include <sys/ioctl.h>
-#include <net/if.h>              // struct ifreq, IFF_* flags :contentReference[oaicite:3]{index=3}
-#include <linux/if_tun.h>        // TUNSETIFF, IFF_TUN, IFF_NO_PI :contentReference[oaicite:4]{index=4}
-#include <systemd/sd-daemon.h>   // sd_listen_fds(), SD_LISTEN_FDS_START :contentReference[oaicite:5]{index=5}
-#include "wireguard.h"           // embeddable‑wg‑library API 
+#include <net/if.h>              // struct ifreq, IFF_* flags
+#include <linux/if_tun.h>        // TUNSETIFF, IFF_TUN, IFF_NO_PI
+#include "wireguard.h"           // embeddable‑wg‑library API
 
 #define TUN_DEVICE   "/dev/net/tun"
 #define IF_NAME      "wg0"
@@ -34,61 +33,86 @@ static int open_tun(const char *ifname) {
     return fd;
 }
 
+static int parse_activation() {
+    // Manual systemd socket activation parser:
+    // LISTEN_PID must match our pid, LISTEN_FDS >=1
+    char *pid_env = getenv("LISTEN_PID");
+    char *fds_env = getenv("LISTEN_FDS");
+    if (!pid_env || !fds_env) {
+        fprintf(stderr, "ERROR: LISTEN_PID or LISTEN_FDS not set\n");
+        return -1;
+    }
+    pid_t pid = (pid_t)atoi(pid_env);
+    int fds = atoi(fds_env);
+    if (pid != getpid() || fds < 1) {
+        fprintf(stderr, "ERROR: No socket activated (pid=%d fds=%d)\n", pid, fds);
+        return -1;
+    }
+    // clear to avoid child inheritance confusion
+    unsetenv("LISTEN_PID");
+    unsetenv("LISTEN_FDS");
+    return 3;  // first activated FD is 3
+}
+
 int main(void) {
-    // 1) Grab the UDP socket passed by systemd on FD 3
-    int n_fds = sd_listen_fds(0);
-    if (n_fds < 1) {
-        fprintf(stderr, "No sockets passed by systemd\n");
+    // 1) Acquire UDP socket (FD 3) via socket activation
+    int udp_fd = parse_activation();
+    if (udp_fd < 0) {
         return EXIT_FAILURE;
     }
-    int udp_fd = SD_LISTEN_FDS_START;  // usually 3
 
-    // 2) Open or create wg0 as a TUN device
+    // 2) Open or create the TUN device wg0
     int tun_fd = open_tun(IF_NAME);
 
     // 3) Create the kernel WireGuard interface
     if (wg_add_device(IF_NAME) != 0) {
-        fprintf(stderr, "Error: wg_add_device failed\n");
+        fprintf(stderr, "ERROR: wg_add_device failed\n");
         return EXIT_FAILURE;
     }
 
-    // 4) Retrieve the wg_device handle
+    // 4) Retrieve the device handle
     struct wg_device *dev = NULL;
     if (wg_get_device(&dev, IF_NAME) != 0 || dev == NULL) {
-        fprintf(stderr, "Error: wg_get_device failed\n");
+        fprintf(stderr, "ERROR: wg_get_device failed\n");
         return EXIT_FAILURE;
     }
 
     // 5) Load private key from WG_PRIVATE_KEY (base64)
     char *b64 = getenv("WG_PRIVATE_KEY");
-    if (b64) {
-        wg_key key;
-        if (wg_key_from_base64(key, b64) != 0) {  // arrays decay to pointers in params :contentReference[oaicite:6]{index=6}
-            fprintf(stderr, "Error: invalid private key\n");
-            wg_free_device(dev);
-            return EXIT_FAILURE;
+    if (!b64) {
+        fprintf(stderr, "ERROR: WG_PRIVATE_KEY not set\n");
+        wg_free_device(dev);
+        return EXIT_FAILURE;
+    }
+    wg_key key;
+    if (wg_key_from_base64(key, b64) != 0) {
+        fprintf(stderr, "ERROR: invalid private key\n");
+        wg_free_device(dev);
+        return EXIT_FAILURE;
+    }
+    memcpy(dev->private_key, key, sizeof(key));
+    dev->flags |= WGDEVICE_HAS_PRIVATE_KEY;
+
+    // 6) Optional: set listen port from WG_LISTEN_PORT
+    char *port_env = getenv("WG_LISTEN_PORT");
+    if (port_env) {
+        int port = atoi(port_env);
+        if (port > 0 && port <= 65535) {
+            dev->listen_port = (uint16_t)port;
+            dev->flags |= WGDEVICE_HAS_LISTEN_PORT;
         }
-        memcpy(dev->private_key, key, sizeof(key));
-        dev->flags |= WGDEVICE_HAS_PRIVATE_KEY;
     }
 
-    // 6) Optionally set listen port from WG_LISTEN_PORT
-    char *port = getenv("WG_LISTEN_PORT");
-    if (port) {
-        dev->listen_port = (uint16_t)atoi(port);
-        dev->flags |= WGDEVICE_HAS_LISTEN_PORT;
-    }
-
-    // 7) Apply configuration via Netlink
+    // 7) Apply WireGuard configuration
     if (wg_set_device(dev) != 0) {
-        fprintf(stderr, "Error: wg_set_device failed\n");
+        fprintf(stderr, "ERROR: wg_set_device failed\n");
         wg_free_device(dev);
         return EXIT_FAILURE;
     }
     wg_free_device(dev);
 
-    // 8) Assign IP and bring link up (libwg does not handle IP setup)
-    char *addr = getenv("WG_ADDRESS");  // e.g. "10.8.0.1/24"
+    // 8) Assign interface address from WG_ADDRESS and bring wg0 up
+    char *addr = getenv("WG_ADDRESS"); // e.g. "10.8.0.1/24"
     if (addr) {
         char cmd[128];
         snprintf(cmd, sizeof(cmd), "ip address add dev %s %s", IF_NAME, addr);
@@ -96,27 +120,27 @@ int main(void) {
     }
     system("ip link set up dev " IF_NAME);
 
-    // 9) Poll loop: shuttle packets TUN ↔ UDP
+    // 9) Poll loop: shuttle packets between TUN and UDP socket
     struct pollfd fds[2] = {
         { .fd = tun_fd, .events = POLLIN },
         { .fd = udp_fd,  .events = POLLIN }
     };
     unsigned char buf[BUF_SIZE];
-    for (;;) {
-        if (poll(fds, 2, -1) < 0) {
+
+    while (1) {
+        int ret = poll(fds, 2, -1);
+        if (ret < 0 && errno != EINTR) {
             perror("poll");
             break;
         }
-        // TUN → UDP
         if (fds[0].revents & POLLIN) {
-            ssize_t len = read(tun_fd, buf, BUF_SIZE);
-            if (len > 0 && send(udp_fd, buf, len, 0) < 0)
+            ssize_t n = read(tun_fd, buf, BUF_SIZE);
+            if (n > 0 && send(udp_fd, buf, n, 0) < 0)
                 perror("send udp");
         }
-        // UDP → TUN
         if (fds[1].revents & POLLIN) {
-            ssize_t len = recv(udp_fd, buf, BUF_SIZE, 0);
-            if (len > 0 && write(tun_fd, buf, len) < 0)
+            ssize_t n = recv(udp_fd, buf, BUF_SIZE, 0);
+            if (n > 0 && write(tun_fd, buf, n) < 0)
                 perror("write tun");
         }
     }

@@ -1,35 +1,35 @@
-FROM debian:bookworm-slim AS builder
+# ────────────────
+# Stage 1: Alpine builder (musl + git)
+# ────────────────
+FROM alpine:3.18 AS builder
 
-# 1) Install build and runtime dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-      build-essential \
-      pkg-config \
-      libsystemd-dev \
-      wireguard-tools \
-      iproute2 socat && \
-    rm -rf /var/lib/apt/lists/*
+# Install build tools, clone embeddable‑wg sources
+RUN apk add --no-cache \
+      build-base \
+      linux-headers \
+      git \
+      iproute2
 
-# 2) Copy and compile the embeddable WireGuard shim
-COPY wireguard.c wireguard.h shim.c /src/
-WORKDIR /src
-# Compile a static wg-shim (so it runs in Alpine‑based WG‑Easy)
+RUN git clone https://git.zx2c4.com/wireguard-tools.git /wireguard-tools
+
+# Copy only the embeddable library + our shim
+WORKDIR /wireguard-tools/contrib/embeddable-wg-library
+COPY shim.c .
+
+# Compile static with musl (no libsystemd)
 RUN gcc -O2 -static -s shim.c wireguard.c \
-    $(pkg-config --cflags --libs libsystemd) \
-    -o wg-shim
+    -o /usr/local/bin/wg-shim
 
 # ────────────────
-# Stage 2: WG‑Easy with Shim
+# Stage 2: Final (wg-easy base)
 # ────────────────
 FROM ghcr.io/wg-easy/wg-easy:latest
 
-# Copy in your statically‑linked shim
-COPY --from=builder /src/wg-shim /usr/local/bin/wg-shim
+# Copy statically‑linked shim
+COPY --from=builder /usr/local/bin/wg-shim /usr/local/bin/wg-shim
 
-# Copy your entrypoint (which runs wg-shim & then the UI)
+# Make sure entrypoint calls wg-shim then UI
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/wg-shim /usr/local/bin/entrypoint.sh
 
-# The quadlet will pass FD 3 (UDP) and FD 4 (UI) into this container,
-# and /dev/net/tun is added via the quadlet.
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
