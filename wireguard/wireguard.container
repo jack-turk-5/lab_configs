@@ -9,7 +9,7 @@ Image=localhost/wireguard/wg-custom:latest
 Network=none
 Volume=wireguard-config:/etc/wireguard:Z
 
-AddDevice=-/dev/net/tun:/dev/net/tun:rwm
+AddDevice=/dev/net/tun:/dev/net/tun:rwm
 AddCapability=NET_ADMIN NET_RAW SYS_MODULE
 
 Sysctl=net.ipv4.ip_forward=1
