@@ -20,16 +20,17 @@ COPY shim.c .
 RUN gcc -O2 -g shim.c wireguard.c \
     -o /usr/local/bin/wg-shim
 
-# ────────────────
-# Stage 2: Final (wg-easy base)
-# ────────────────
 FROM ghcr.io/wg-easy/wg-easy:latest
-RUN apk add --no-cache socat iproute2
-# Copy statically‑linked shim
-COPY --from=builder /usr/local/bin/wg-shim /usr/local/bin/wg-shim
 
-# Make sure entrypoint calls wg-shim then UI
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+# Install wg-quick and other dependencies
+RUN apk add --no-cache \
+        wireguard-tools-wg-quick \
+        iproute2 \
+        socat
+
+# Copy the updated shim and entrypoint
+COPY --from=builder /usr/local/bin/wg-shim /usr/local/bin/wg-shim
+COPY entrypoint.sh               /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/wg-shim /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
