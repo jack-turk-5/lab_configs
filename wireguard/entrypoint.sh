@@ -2,5 +2,5 @@
 set -e
 wg-quick up wg0
 socat -u UDP6-LISTEN:51820,bind=[::],reuseaddr,fork,ipv6only=0 FD:3 &
-socat TCP6-LISTEN:51821,bind=[::],reuseaddr,fork,ipv6only=0 FD:4 &
+socat FD:4,fork,reuseaddr TCP6:[::]:51821 &
 exec node server.js
