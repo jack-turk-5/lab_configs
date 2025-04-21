@@ -14,10 +14,10 @@ socat -d -d \
 #    Replace 10.8.0.1/24 with the address from your wg0 config
 socat -d -d \
     FD:3 \
-    TUN:10.8.0.1/24,tun-name=wg0,iff-no-pi &
+    TUN:10.8.0.1/24,iff-no-pi &
 
 socat -d -d \
-    TUN:10.8.0.1/24,tun-name=wg0,iff-no-pi \
+    TUN:10.8.0.1/24,iff-no-pi \
     FD:3 &
 
 # 4) Start the UI
