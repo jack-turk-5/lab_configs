@@ -8,15 +8,15 @@
 #include <errno.h>
 #include <poll.h>
 #include <sys/ioctl.h>
-#include <net/if.h>              // struct ifreq, IFF_* flags
-#include <linux/if_tun.h>        // TUNSETIFF, IFF_TUN, IFF_NO_PI :contentReference[oaicite:1]{index=1}
-#include "wireguard.h"           // embeddable‑wg‑library API
+#include <net/if.h>              // struct ifreq, IFF_* flags 
+#include <linux/if_tun.h>        // TUNSETIFF, IFF_TUN, IFF_NO_PI 
+#include "wireguard.h"           // embeddable‑wg‑library API 
 
 #define TUN_DEV    "/dev/net/tun"
 #define IFACE      "wg0"
 #define BUF_SIZE   65536
 
-// 1) Grab UDP socket via systemd LISTEN_FDS (>=1) :contentReference[oaicite:2]{index=2}
+// 1) Parse socket activation: require LISTEN_FDS ≥1, return FD 3 :contentReference[oaicite:0]{index=0}
 static int parse_activation(void) {
     char *env = getenv("LISTEN_FDS");
     int fds = env ? atoi(env) : 0;
@@ -25,14 +25,14 @@ static int parse_activation(void) {
         fprintf(stderr, "ERROR: No socket activated (LISTEN_FDS=%d)\n", fds);
         return -1;
     }
-    return 3; // first socket FD
+    return 3;
 }
 
-// 2) Create wg0 idempotently (ignore EEXIST) :contentReference[oaicite:3]{index=3}
+// 2) Create wg0 idempotently (treat EEXIST as non‑fatal) :contentReference[oaicite:1]{index=1}
 static int create_device(void) {
-    int r = wg_add_device(IFACE);   // netlink: ip link add wg0 type wireguard :contentReference[oaicite:4]{index=4}
+    int r = wg_add_device(IFACE);                  // netlink: ip link add wg0 type wireguard :contentReference[oaicite:2]{index=2}
     int e = errno;
-    if (r != 0 && e != EEXIST) {    // only fatal on unexpected errors :contentReference[oaicite:5]{index=5}
+    if (r != 0 && e != EEXIST) {                    // only fatal on unexpected errors 
         fprintf(stderr, "ERROR: wg_add_device failed (%s)\n", strerror(e));
         return -1;
     }
@@ -40,12 +40,12 @@ static int create_device(void) {
     return 0;
 }
 
-// 3) Strip unsupported lines (like Address=) and apply config :contentReference[oaicite:6]{index=6}
+// 3) Strip unsupported lines (e.g. Address=) and apply config :contentReference[oaicite:3]{index=3}
 static int apply_config(void) {
     char cmd[256];
     snprintf(cmd, sizeof(cmd),
-        "wg-quick strip " IFACE " | wg setconf " IFACE " -");
-    int rc = system(cmd);  // shell handles the pipeline :contentReference[oaicite:7]{index=7}
+             "wg-quick strip " IFACE " | wg setconf " IFACE " -");
+    int rc = system(cmd);                          // pipeline handled by shell :contentReference[oaicite:4]{index=4}
     if (rc != 0) {
         fprintf(stderr, "ERROR: wg setconf returned %d\n", rc);
         return -1;
@@ -54,12 +54,12 @@ static int apply_config(void) {
     return 0;
 }
 
-// 4) Bring the interface up (L2/L3) :contentReference[oaicite:8]{index=8}
+// 4) Bring the interface up at L2/L3 
 static void setup_link(void) {
     system("ip link set up dev " IFACE);
 }
 
-// 5) Open TUN device for packet I/O :contentReference[oaicite:9]{index=9}
+// 5) Open the TUN device for packet I/O 
 static int open_tun(const char *name) {
     struct ifreq ifr = {0};
     int fd = open(TUN_DEV, O_RDWR);
@@ -76,16 +76,19 @@ static int open_tun(const char *name) {
 }
 
 int main(void) {
+    // Acquire socket‑activated UDP on FD 3
     int udp_fd = parse_activation();
     if (udp_fd < 0) return EXIT_FAILURE;
 
+    // Create and configure wg0
     if (create_device() < 0) return EXIT_FAILURE;
     if (apply_config() < 0)   return EXIT_FAILURE;
     setup_link();
 
+    // Now open TUN and start packet loop
     int tun_fd = open_tun(IFACE);
 
-    // 6) Proxy loop: TUN ↔ UDP using poll() :contentReference[oaicite:10]{index=10}
+    // 6) Proxy loop between TUN ↔ UDP using poll() :contentReference[oaicite:5]{index=5}
     struct pollfd fds[2] = {
         { .fd = tun_fd, .events = POLLIN },
         { .fd = udp_fd,  .events = POLLIN }
