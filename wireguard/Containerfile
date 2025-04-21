@@ -17,7 +17,7 @@ WORKDIR /wireguard-tools/contrib/embeddable-wg-library
 COPY shim.c .
 
 # Compile static with musl (no libsystemd)
-RUN gcc -O2 -static -s shim.c wireguard.c \
+RUN gcc -O2 -g shim.c wireguard.c \
     -o /usr/local/bin/wg-shim
 
 # ────────────────
