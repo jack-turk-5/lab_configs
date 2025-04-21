@@ -8,10 +8,10 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <sys/ioctl.h>
-#include <linux/if.h>
-#include <linux/if_tun.h>
-#include <systemd/sd-daemon.h>   // for sd_listen_fds() :contentReference[oaicite:0]{index=0}
-#include "wireguard.h"           // embeddable‑wg‑library header :contentReference[oaicite:1]{index=1}
+#include <net/if.h>              // struct ifreq, IFF_* flags :contentReference[oaicite:3]{index=3}
+#include <linux/if_tun.h>        // TUNSETIFF, IFF_TUN, IFF_NO_PI :contentReference[oaicite:4]{index=4}
+#include <systemd/sd-daemon.h>   // sd_listen_fds(), SD_LISTEN_FDS_START :contentReference[oaicite:5]{index=5}
+#include "wireguard.h"           // embeddable‑wg‑library API 
 
 #define TUN_DEVICE   "/dev/net/tun"
 #define IF_NAME      "wg0"
@@ -19,7 +19,7 @@
 
 static int open_tun(const char *ifname) {
     struct ifreq ifr = {0};
-    int fd = open(TUN_DEVICE, O_RDWR);  // requires CAP_NET_ADMIN & /dev/net/tun mount 
+    int fd = open(TUN_DEVICE, O_RDWR);
     if (fd < 0) {
         perror("open /dev/net/tun");
         exit(EXIT_FAILURE);
@@ -35,65 +35,66 @@ static int open_tun(const char *ifname) {
 }
 
 int main(void) {
-    // 1) Grab systemd‑activated sockets (UDP arrives on FD 3) :contentReference[oaicite:2]{index=2}
+    // 1) Grab the UDP socket passed by systemd on FD 3
     int n_fds = sd_listen_fds(0);
     if (n_fds < 1) {
         fprintf(stderr, "No sockets passed by systemd\n");
         return EXIT_FAILURE;
     }
-    int udp_fd = SD_LISTEN_FDS_START;
+    int udp_fd = SD_LISTEN_FDS_START;  // usually 3
 
-    // 2) Open the TUN device "wg0"
+    // 2) Open or create wg0 as a TUN device
     int tun_fd = open_tun(IF_NAME);
 
-    // 3) Create the kernel WireGuard device
-    if (wg_add_device(IF_NAME) != 0) {   // ip link add ... type wireguard :contentReference[oaicite:3]{index=3}
+    // 3) Create the kernel WireGuard interface
+    if (wg_add_device(IF_NAME) != 0) {
         fprintf(stderr, "Error: wg_add_device failed\n");
         return EXIT_FAILURE;
     }
 
-    // 4) Retrieve a wg_device handle
+    // 4) Retrieve the wg_device handle
     struct wg_device *dev = NULL;
     if (wg_get_device(&dev, IF_NAME) != 0 || dev == NULL) {
         fprintf(stderr, "Error: wg_get_device failed\n");
         return EXIT_FAILURE;
     }
 
-    // 5) Populate the private key (base64 from ENV "WG_PRIVATE_KEY")
+    // 5) Load private key from WG_PRIVATE_KEY (base64)
     char *b64 = getenv("WG_PRIVATE_KEY");
     if (b64) {
         wg_key key;
-        if (wg_key_from_base64(key, (wg_key_b64_string)b64) != 0) {
+        if (wg_key_from_base64(key, b64) != 0) {  // arrays decay to pointers in params :contentReference[oaicite:6]{index=6}
             fprintf(stderr, "Error: invalid private key\n");
+            wg_free_device(dev);
             return EXIT_FAILURE;
         }
         memcpy(dev->private_key, key, sizeof(key));
-        dev->flags |= WGDEVICE_HAS_PRIVATE_KEY;  // mark that we set it :contentReference[oaicite:4]{index=4}
+        dev->flags |= WGDEVICE_HAS_PRIVATE_KEY;
     }
 
-    // 6) Optional: set listen port from ENV "WG_LISTEN_PORT" (default 51820)
+    // 6) Optionally set listen port from WG_LISTEN_PORT
     char *port = getenv("WG_LISTEN_PORT");
     if (port) {
         dev->listen_port = (uint16_t)atoi(port);
-        dev->flags |= WGDEVICE_HAS_LISTEN_PORT;  // mark that we set it :contentReference[oaicite:5]{index=5}
+        dev->flags |= WGDEVICE_HAS_LISTEN_PORT;
     }
 
-    // 7) Apply our configuration to the kernel
-    if (wg_set_device(dev) != 0) {   // netlink call to configure WireGuard :contentReference[oaicite:6]{index=6}
+    // 7) Apply configuration via Netlink
+    if (wg_set_device(dev) != 0) {
         fprintf(stderr, "Error: wg_set_device failed\n");
         wg_free_device(dev);
         return EXIT_FAILURE;
     }
     wg_free_device(dev);
 
-    // 8) Assign the interface IP from ENV "WG_ADDRESS" and bring it up
+    // 8) Assign IP and bring link up (libwg does not handle IP setup)
     char *addr = getenv("WG_ADDRESS");  // e.g. "10.8.0.1/24"
     if (addr) {
         char cmd[128];
         snprintf(cmd, sizeof(cmd), "ip address add dev %s %s", IF_NAME, addr);
-        system(cmd);   // libc system call for ip assignment 
+        system(cmd);
     }
-    system("ip link set up dev " IF_NAME);  // bring wg0 up 
+    system("ip link set up dev " IF_NAME);
 
     // 9) Poll loop: shuttle packets TUN ↔ UDP
     struct pollfd fds[2] = {
@@ -101,7 +102,7 @@ int main(void) {
         { .fd = udp_fd,  .events = POLLIN }
     };
     unsigned char buf[BUF_SIZE];
-    while (1) {
+    for (;;) {
         if (poll(fds, 2, -1) < 0) {
             perror("poll");
             break;
