@@ -6,6 +6,7 @@ FROM alpine:3.18 AS builder
 # Install build tools, clone embeddable‑wg sources
 RUN apk add --no-cache \
       build-base \
+      libcap-dev  \
       linux-headers \
       git \
       iproute2
