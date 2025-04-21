@@ -6,7 +6,8 @@ After=wireguard.socket
 [Container]
 ContainerName=wireguard
 Image=localhost/wireguard/wg-custom:latest
-Network=none
+Network=wireguard.network
+PublishPort=51820:51820/udp
 Volume=wireguard-config:/etc/wireguard:Z
 
 AddCapability=NET_ADMIN NET_RAW SYS_MODULE

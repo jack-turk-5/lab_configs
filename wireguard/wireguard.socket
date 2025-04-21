@@ -2,7 +2,6 @@
 Description=WireGuard Socket (Rootless)
 
 [Socket]
-ListenDatagram=[::]:51820
 ListenStream=[::]:51821
 BindIPv6Only=both
 SocketMode=0600
