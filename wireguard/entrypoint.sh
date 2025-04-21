@@ -1,6 +1,9 @@
 #!/usr/bin/env sh
 set -e
 
+# Ensure LISTEN_FDS is inherited even after backgrounding
+export LISTEN_FDS
+
 # 1) Start the shim (UDP↔TUN & kernel WireGuard) in background
 wg-shim &
 
