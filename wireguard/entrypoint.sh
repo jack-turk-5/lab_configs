@@ -11,7 +11,7 @@ socat -u UDP4-LISTEN:51820,reuseaddr,fork FD:3 &
 
 # FD 4: TCP stream socket (UI)
 # Forward incoming connections to the local HTTP server on 127.0.0.1:51821
-socat TCP4-LISTEN:51821,reuseaddr,fork FD:4 &
+socat ACCEPT:4,fork TCP:127.0.0.1:51821 &
 
 # Finally, start the UI (which now listens only on loopback)
 exec node /app/server.js
