@@ -6,10 +6,10 @@ After=wireguard-udp.socket wireguard-ui.socket
 [Container]
 ContainerName=wireguard
 Image=localhost/wireguard/wg-custom:latest
-AddDevice=/dev/net/tun:/dev/net/tun:rwm
 Network=none
 Volume=wireguard-config:/etc/wireguard:Z
 
+AddDevice=-/dev/net/tun:/dev/net/tun:rwm
 AddCapability=NET_ADMIN NET_RAW SYS_MODULE
 
 Sysctl=net.ipv4.ip_forward=1
