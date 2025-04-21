@@ -44,10 +44,6 @@ static int parse_activation() {
     }
     pid_t pid = (pid_t)atoi(pid_env);
     int fds = atoi(fds_env);
-    if (pid != getpid() || fds < 1) {
-        fprintf(stderr, "ERROR: No socket activated (pid=%d fds=%d)\n", pid, fds);
-        return -1;
-    }
     // clear to avoid child inheritance confusion
     unsetenv("LISTEN_PID");
     unsetenv("LISTEN_FDS");
