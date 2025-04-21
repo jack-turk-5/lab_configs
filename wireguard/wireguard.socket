@@ -2,13 +2,11 @@
 Description=WireGuard Socket (Rootless)
 
 [Socket]
-ListenStream=[::]:51821
 ListenDatagram=[::]:51820
+ListenStream=[::]:51821
 BindIPv6Only=both
-Multicast=false
-Service=wireguard.service
-ListenStream=%t/wireguard.sock
 SocketMode=0600
+Service=wireguard.service
 
 [Install]
 WantedBy=sockets.target
