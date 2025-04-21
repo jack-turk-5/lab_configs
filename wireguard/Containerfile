@@ -1,6 +1,35 @@
+FROM debian:bookworm-slim
+
+# 1) Install build and runtime dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      build-essential \
+      pkg-config \
+      libsystemd-dev \
+      wireguard-tools \
+      iproute2 socat && \
+    rm -rf /var/lib/apt/lists/*
+
+# 2) Copy and compile the embeddable WireGuard shim
+COPY wireguard.c wireguard.h shim.c /src/
+WORKDIR /src
+# Compile a static wg-shim (so it runs in Alpine‑based WG‑Easy)
+RUN gcc -O2 -static -s shim.c wireguard.c \
+    $(pkg-config --cflags --libs libsystemd) \
+    -o wg-shim
+
+# ────────────────
+# Stage 2: WG‑Easy with Shim
+# ────────────────
 FROM ghcr.io/wg-easy/wg-easy:latest
-RUN apk add --no-cache socat
+
+# Copy in your statically‑linked shim
+COPY --from=builder /src/wg-shim /usr/local/bin/wg-shim
+
+# Copy your entrypoint (which runs wg-shim & then the UI)
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD ["/usr/local/bin/entrypoint.sh"]
+RUN chmod +x /usr/local/bin/wg-shim /usr/local/bin/entrypoint.sh
+
+# The quadlet will pass FD 3 (UDP) and FD 4 (UI) into this container,
+# and /dev/net/tun is added via the quadlet.
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
