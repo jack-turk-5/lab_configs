@@ -6,7 +6,7 @@ After=boringtun.service wg-dashboard.socket
 [Container]
 Image=docker.io/donaldzou/wgdashboard:latest
 ContainerName=wireguard-dashboard
-Volume=boringtun-config:/etc/wireguard:ro
+Volume=boringtun-config:/etc/wireguard:Z
 Volume=dashboard-data:/data:Z
 Network=none
 AddCapability=NET_ADMIN

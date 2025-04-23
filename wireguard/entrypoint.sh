@@ -9,5 +9,4 @@ if [ ! -f privatekey ]; then
   echo "ListenPort = 51820"             >> wg0.conf
   echo "Address = 10.8.0.1/24"          >> wg0.conf
 fi
-
 exec boringtun -f --interface wg0 --config wg0.conf
