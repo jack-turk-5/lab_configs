@@ -1,4 +1,5 @@
 FROM docker.io/rust:alpine as builder
+RUN apk add --no-cache build-base musl-dev linux-headers
 WORKDIR /usr/src 
 RUN cargo install --locked boringtun-cli
 FROM alpine:latest
