@@ -8,7 +8,7 @@ Image=docker.io/donaldzou/wgdashboard:latest
 ContainerName=wireguard-dashboard
 Volume=boringtun-config:/etc/wireguard:Z
 Volume=dashboard-data:/data:Z
-Network=none
+Network=wg-dashboard.network
 AddCapability=NET_ADMIN
 
 [Install]
