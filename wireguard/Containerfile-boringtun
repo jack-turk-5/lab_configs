@@ -5,7 +5,7 @@ RUN cargo install --locked boringtun-cli
 FROM alpine:latest
 RUN apk add --no-cache iproute2 iptables wireguard-tools \
  && addgroup -S wireguard && adduser -S -G wireguard wireguard
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY entrypoint-boringtun.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 COPY --from=builder /usr/local/cargo/bin/boringtun-cli /usr/bin/boringtun
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

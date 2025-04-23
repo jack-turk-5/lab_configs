@@ -1,5 +1,5 @@
 FROM docker.io/donaldzou/wgdashboard:latest
 RUN apk add --no-cache socat
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY entrypoint-dashboard.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
-ENTRYPOINT ["/usr/local/bin/entrypoint-dashboard.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
