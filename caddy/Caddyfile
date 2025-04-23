@@ -22,8 +22,8 @@ https://vpn.jackturk.dev forge.jackturk.dev {
     reverse_proxy [::1]:10086
   }
 
-  @vpn host foo.jackturk.dev
-  handle @vpn {
+  @foo host foo.jackturk.dev
+  handle @foo {
     reverse_proxy [::1]:10086
   }
 
