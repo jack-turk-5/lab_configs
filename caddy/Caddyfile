@@ -1,4 +1,8 @@
 {
+
+  # Caddy will try LE, then ZeroSSL, then other configured CAs
+  acme_ca https://acme.zerossl.com/v2/DV90
+  email jackturk5@outlook.com
   # socket‑activation: fd3=80/tcp, fd4=443/tcp, fd5=443/udp, fd6=admin
   debug
   admin   fd/6
