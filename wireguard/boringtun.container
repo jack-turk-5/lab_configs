@@ -1,0 +1,18 @@
+[Unit]
+Description=BoringTun VPN (userspace WireGuard)
+After=boringtun.socket
+Wants=boringtun.socket
+
+[Container]
+Image=boringtun.build
+ContainerName=boringtun
+Command=/usr/local/bin/entrypoint.sh
+Volume=boringtun-config:/etc/wireguard:Z
+Network=none
+Devices=/dev/net/tun:/dev/net/tun:rwm
+AddCapability=NET_ADMIN
+AddCapability=NET_RAW
+Restart=always
+
+[Install]
+WantedBy=default.target

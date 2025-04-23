@@ -1,0 +1,14 @@
+[Unit]
+Description=WGDashboard Web UI for WireGuard
+After=boringtun.service
+
+[Container]
+Image=donaldzou/wgdashboard:latest
+ContainerName=wireguard-dashboard
+Volume=boringtun-config:/etc/wireguard:ro
+Network=none
+AddCapability=NET_ADMIN
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

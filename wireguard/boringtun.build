@@ -1,0 +1,9 @@
+[Unit]
+Description=Build BoringTun userspace WireGuard binary
+
+[Build]
+ContextDirectory=/home/podman/lab_configs/wireguard
+Containerfile=Dockerfile
+
+[Install]
+WantedBy=default.target

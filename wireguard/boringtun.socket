@@ -1,11 +1,11 @@
 [Unit]
-Description=WireGuard Socket for UDP (Rootless)
+Description=Boringtun Socket for UDP (Rootless)
 
 [Socket]
 ListenDatagram=[::]:51820
 BindIPv6Only=both
 SocketMode=0600
-Service=wireguard.service
+Service=boringtun.service
 
 [Install]
 WantedBy=sockets.target
