@@ -4,9 +4,8 @@ After=boringtun.socket
 Wants=boringtun.socket
 
 [Container]
-Image=boringtun.build
+Image=localhost/boringtun/boringtun-custom:
 ContainerName=boringtun
-Command=/usr/local/bin/entrypoint.sh
 Volume=boringtun-config:/etc/wireguard:Z
 Network=none
 Devices=/dev/net/tun:/dev/net/tun:rwm

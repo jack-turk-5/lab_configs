@@ -10,7 +10,6 @@ Volume=boringtun-config:/etc/wireguard:ro
 Volume=dashboard-data:/data:Z
 Network=none
 AddCapability=NET_ADMIN
-Restart=on-failure
 
 [Install]
 WantedBy=default.target
