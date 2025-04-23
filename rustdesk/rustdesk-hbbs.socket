@@ -1,13 +1,12 @@
 [Unit]
-Description=RustDesk Socket (Rootless)
+Description=RustDesk Socket for hbbs (Rootless)
 
 [Socket]
 ListenStream=[::]:21115
 ListenStream=[::]:21116
 ListenDatagram=[::]:21116
-ListenStream=[::]:21117
 BindIPv6Only=both
-Service=rustdesk-hbbr.service rustdesk-hbbs.service
+Service=rustdesk-hbbs.service
 
 [Install]
 WantedBy=sockets.target

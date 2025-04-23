@@ -1,7 +1,7 @@
 [Unit]
 Description=RustDesk via Rootless Sockets
-Requires=rustdesk.socket
-After=rustdesk.socket
+Requires=rustdesk-hbbr.socket
+After=rustdesk-hbbr.socket
 
 [Container]
 AutoUpdate=registry
