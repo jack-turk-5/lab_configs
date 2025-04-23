@@ -4,7 +4,7 @@ After=boringtun.socket
 Wants=boringtun.socket
 
 [Container]
-Image=boringtun.build
+Image=localhost/boringtun/boringtun-custom:latest
 ContainerName=boringtun
 Volume=boringtun-config:/etc/wireguard:Z
 Network=none

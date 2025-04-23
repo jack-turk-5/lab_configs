@@ -2,6 +2,7 @@
 Description=Build BoringTun userspace WireGuard binary
 
 [Build]
+ImageTag=localhost/boringtun/boringtun-custom:latest
 ContextDirectory=/home/podman/lab_configs/wireguard
 Containerfile=Dockerfile
 
