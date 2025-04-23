@@ -4,14 +4,12 @@ After=boringtun.socket
 Wants=boringtun.socket
 
 [Container]
-Image=localhost/boringtun/boringtun-custom:
+Image=boringtun.build
 ContainerName=boringtun
 Volume=boringtun-config:/etc/wireguard:Z
 Network=none
-Devices=/dev/net/tun:/dev/net/tun:rwm
-AddCapability=NET_ADMIN
-AddCapability=NET_RAW
-Restart=always
+AddDevice=/dev/net/tun:/dev/net/tun:rwm
+AddCapability=NET_ADMIN NET_RAW
 
 [Install]
 WantedBy=default.target
