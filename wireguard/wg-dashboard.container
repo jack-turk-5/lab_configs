@@ -10,6 +10,7 @@ Volume=boringtun-config:/etc/wireguard:Z
 Volume=dashboard-data:/data:Z
 Network=wg-dashboard.network
 AddCapability=NET_ADMIN
+Environment=public_ip=10.8.0.1
 
 [Install]
 WantedBy=default.target
