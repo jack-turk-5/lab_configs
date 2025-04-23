@@ -7,7 +7,7 @@ ListenStream=[::]:21116
 ListenDatagram=[::]:21116
 ListenStream=[::]:21117
 BindIPv6Only=both
-Service=rustdesk.service
+Service=rustdesk-hbbr.service rustdesk-hbbs.service
 
 [Install]
 WantedBy=sockets.target
