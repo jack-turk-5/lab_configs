@@ -10,7 +10,7 @@ Network=caddy-internal.network
 Notify=true
 Volume=/home/podman/lab_configs/caddy/Caddyfile:/etc/caddy/Caddyfile:Z
 Volume=caddy-config:/config:Z
-Volume=caddy-datadata:/data:Z
+Volume=caddy-data:/data:Z
 Exec=caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
 
 [Install]
