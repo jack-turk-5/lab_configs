@@ -26,4 +26,9 @@ https://vpn.jackturk.dev forge.jackturk.dev {
   handle @forge {
     reverse_proxy host.containers.internal:3000
   }
+
+  @forge host forge.jackturk.dev
+  handle @forge {
+    reverse_proxy host.containers.internal:3000
+  }
 }

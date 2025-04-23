@@ -1,0 +1,13 @@
+[Unit]
+Description=RustDesk Socket (Rootless)
+
+[Socket]
+ListenStream=[::]:21115
+ListenStream=[::]:21116
+ListenDatagram=[::]:21116
+ListenStream=[::]:21117
+BindIPv6Only=both
+Service=rustdesk.service
+
+[Install]
+WantedBy=sockets.target

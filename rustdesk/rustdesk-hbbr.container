@@ -1,0 +1,14 @@
+[Unit]
+Description=RustDesk via Rootless Sockets
+Requires=rustdesk.socket
+After=rustdesk.socket
+
+[Container]
+AutoUpdate=registry
+Image=ghcr.io/rustdesk/rustdesk-server:latest
+Exec=hbbr
+Volume=rustdesk-data:/root
+Network=rustdesk.network
+
+[Install]
+WantedBy=default.target
