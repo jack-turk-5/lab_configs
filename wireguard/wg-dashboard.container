@@ -4,7 +4,7 @@ Wants=wg-dashboard.socket
 After=boringtun.service wg-dashboard.socket
 
 [Container]
-Image=docker.io/donaldzou/wgdashboard:latest
+Image=localhost/wireguard/dashboard:latest
 ContainerName=wireguard-dashboard
 Volume=boringtun-config:/etc/wireguard:Z
 Volume=dashboard-data:/data:Z
