@@ -19,7 +19,7 @@ https://vpn.jackturk.dev forge.jackturk.dev {
 
   @vpn host vpn.jackturk.dev
   handle @vpn {
-    reverse_proxy host.containers.internal:10086
+    reverse_proxy localhost:10086
   }
 
   @forge host forge.jackturk.dev
