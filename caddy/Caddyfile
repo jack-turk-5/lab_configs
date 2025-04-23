@@ -1,7 +1,7 @@
 {
-  acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+  acme_ca https://acme.zerossl.com/v2/DV90
   email jackturk5@outlook.com
-  debug
+  # socket‑activation: fd3=80/tcp, fd4=443/tcp, fd5=443/udp, fd6=admin
   admin   fd/6
 }
 
