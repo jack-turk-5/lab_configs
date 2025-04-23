@@ -1,11 +1,13 @@
 [Unit]
 Description=WGDashboard Web UI for WireGuard
-After=boringtun.service
+Wants=wg-dashboard.socket
+After=boringtun.service wg-dashboard.socket
 
 [Container]
 Image=donaldzou/wgdashboard:latest
 ContainerName=wireguard-dashboard
 Volume=boringtun-config:/etc/wireguard:ro
+Volume=dashboard-data:/data:Z
 Network=none
 AddCapability=NET_ADMIN
 Restart=on-failure
