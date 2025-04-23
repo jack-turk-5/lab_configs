@@ -1,42 +1,29 @@
 {
-    # Use ZeroSSL as the ACME provider to avoid Let's Encrypt rate limits
-    acme_ca    https://acme.zerossl.com/v2/DV90  
-    # Email for ACME account registration  
-    email      jackturk5@outlook.com  
-    # Enable debug-level logging  
-    debug  
-    # Map HTTP and HTTPS to systemd socket FDs  
-    http_port   fd/3  
-    https_port  fd/4  
-    # Expose the Admin API on FD 6  
-    admin       fd/6  
+  # socket‑activation: fd3=80/tcp, fd4=443/tcp, fd5=443/udp, fd6=admin
+  debug
+  admin   fd/6
 }
 
-# Redirect all HTTP traffic for both domains to HTTPS
 http://vpn.jackturk.dev forge.jackturk.dev {
-    handle {
-        redir https://{host}{uri} permanent
-    }
+  bind fd/3 {
+    protocols h1
+  }
+  redir https://{host}{uri} permanent
 }
 
-# Serve HTTPS for both domains, proxying to backends
 https://vpn.jackturk.dev forge.jackturk.dev {
-    # Enable gzip compression
-    encode gzip
+  bind       fd/4 { 
+    protocols h1 h2 
+  }
+  encode     gzip
 
-    # Match VPN dashboard host and proxy to boringtun dashboard
-    @vpn {
-        host vpn.jackturk.dev
-    }
-    handle @vpn {
-        reverse_proxy [::1]:10086
-    }
+  @vpn host vpn.jackturk.dev
+  handle @vpn {
+    reverse_proxy [::1]:10086
+  }
 
-    # Match Forge backend host and proxy accordingly
-    @forge {
-        host forge.jackturk.dev
-    }
-    handle @forge {
-        reverse_proxy host.containers.internal:3000
-    }
+  @forge host forge.jackturk.dev
+  handle @forge {
+    reverse_proxy host.containers.internal:3000
+  }
 }
