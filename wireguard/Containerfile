@@ -1,5 +1,4 @@
-# 1) Build stage: compile boringtun-cli from crates.io
-FROM rust:slim as builder
+FROM docker.io/rust:alpine as builder
 WORKDIR /usr/src 
 RUN cargo install --locked boringtun-cli
 FROM alpine:latest
