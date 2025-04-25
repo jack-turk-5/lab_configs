@@ -75,8 +75,8 @@ cd "$WGDASH/src"
 
 exec gunicorn \
   --config ./gunicorn.conf.py \
-  --bind fd://3 \
   --daemon False \
+  --bind fd://3 \
   --workers ${GUNICORN_WORKERS:-4} \
   --timeout ${GUNICORN_TIMEOUT:-120} \
   wsgi_app=dashboard:app
