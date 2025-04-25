@@ -75,8 +75,7 @@ boringtun-cli --foreground wg0 &                              # spawn Boringtun 
 cd "$WGDASH/src"
 sed -i 's/^daemon = True/daemon = False/' gunicorn.conf.py
 
-export GUNICORN_CMD_ARGS="--bind=fd://3 --daemon=false --workers=${GUNICORN_WORKERS:-4}"
 
 echo "→ Launching WGDashboard (Gunicorn → FD 3)…"
-bash ./wgd.sh start
+bash GUNICORN_CMD_ARGS="--bind=fd://3 --daemon=false --workers=${GUNICORN_WORKERS:-4}" ./wgd.sh start
 ensure_blocking
