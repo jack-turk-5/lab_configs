@@ -7,9 +7,6 @@ RUN apk add --no-cache build-base musl-dev linux-headers \
 # === Stage 2: Final Image on WGDashboard Base ===
 FROM docker.io/donaldzou/wgdashboard:latest
 
-# Install runtime dependencies
-USER root
-
 # Copy Boringtun binary from builder stage
 COPY --from=builder /usr/local/cargo/bin/boringtun-cli /usr/bin/boringtun-cli
 
