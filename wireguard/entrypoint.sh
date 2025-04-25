@@ -17,7 +17,7 @@ ensure_blocking() {
 trap 'echo "[WGDashboard] Stopping..."; bash "$WGDASH/src/wgd.sh" stop; exit 0' SIGTERM
 
 # ----- Paths & Config -----
-WGDASH=/opt/wireguarddashboard         # upstream application root
+WGDASH=/opt/wireguarddashboard # upstream application root
 CONFIG=/data/wg-dashboard.ini
 
 echo "------------------------- START ----------------------------"
@@ -29,18 +29,18 @@ export WG_SUDO=1
 echo "→ Installing/updating WGDashboard…"
 chmod +x "$WGDASH/src/wgd.sh"
 cd "$WGDASH/src"
-sed -i '/clear/d' ./wgd.sh                                  # remove clears for logging :contentReference[oaicite:3]{index=3}
+sed -i '/clear/d' ./wgd.sh # remove clears for logging
 
 mkdir -p /data/db
 ln -sf /data/db ./db
 touch "$CONFIG"
 ln -sf "$CONFIG" ./wg-dashboard.ini
 
-python3 -m venv venv                                        # create venv
+python3 -m venv venv # create venv
 mv /usr/lib/python3.12/site-packages/psutil* venv/lib/python3.12/site-packages/
 mv /usr/lib/python3.12/site-packages/bcrypt* venv/lib/python3.12/site-packages/
 
-./wgd.sh install                                           # install Python deps, WireGuard tools, etc. :contentReference[oaicite:4]{index=4}
+./wgd.sh install # install Python deps, WireGuard tools, etc.
 
 # 2) replicate set_envvars()
 echo "→ Setting environment variables…"
@@ -60,11 +60,14 @@ else
   sed -i "s|^app_port = .*|app_port = ${wgd_port:-10086}|"               "$CONFIG"
 fi
 
+# Fix file permissions
 chmod 600 /etc/wireguard/wg0.conf
 chmod 600 /etc/wireguard/privatekey /etc/wireguard/publickey
 
 # 3) Bring up wg0 via Boringtun
 echo "→ Starting Boringtun userspace VPN…"
+# Remove any stale wg0 interface to avoid 'already exists'
+ip link delete wg0 2>/dev/null || true
 cd /etc/wireguard
 if [ ! -f privatekey ]; then
   umask 077
@@ -76,12 +79,22 @@ ListenPort  = 51820
 EOF
 fi
 
-boringtun-cli --foreground wg0 &                              # spawn Boringtun :contentReference[oaicite:5]{index=5}
+boringtun-cli --foreground wg0 &  # spawn Boringtun
+sleep 0.1
+ip addr add ${WG_IP:-10.8.0.1}/24 dev wg0
+ip link set wg0 up
+wg setconf wg0 wg0.conf
+
+# 4) Prepare WGDashboard startup
 cd "$WGDASH/src"
+# Disable Gunicorn daemon mode so it stays in foreground
 sed -i 's/^daemon = True/daemon = False/' gunicorn.conf.py
+# Remove sudo to preserve environment variables
+sed -i 's|sudo "\$venv_gunicorn|"\$venv_gunicorn|g' wgd.sh
+# Export Gunicorn CLI overrides to bind FD 3 in foreground
+export GUNICORN_CMD_ARGS="--bind=fd://3 --daemon=false --workers=${GUNICORN_WORKERS:-4}"
 
 echo "→ Launching WGDashboard (Gunicorn → FD 3)…"
-export GUNICORN_CMD_ARGS="--bind=fd://3 --daemon False --workers=${GUNICORN_WORKERS:-4}"
-sed -i 's|sudo "\$venv_gunicorn|"\$venv_gunicorn|g' "$WGDASH/src/wgd.sh"
+# 5) Start the dashboard and block
 bash ./wgd.sh start
 ensure_blocking
