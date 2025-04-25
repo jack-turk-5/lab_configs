@@ -1,7 +1,7 @@
 [Unit]
 Description=Rootless Reverse Proxy via Caddy
 Requires=caddy.socket
-After=wg-dashboard.service forgejo.service caddy.socket
+After=wireguard.service forgejo.service caddy.socket
 
 [Container]
 ContainerName=caddy
