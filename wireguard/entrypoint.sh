@@ -92,7 +92,7 @@ sed -i 's/^daemon = True/daemon = False/' gunicorn.conf.py
 # Remove sudo to preserve environment variables
 sed -i 's|sudo "\$venv_gunicorn|"\$venv_gunicorn|g' wgd.sh
 # Export Gunicorn CLI overrides to bind FD 3 in foreground
-export GUNICORN_CMD_ARGS="--bind=fd://3 --daemon=False --workers=${GUNICORN_WORKERS:-4}"
+export GUNICORN_CMD_ARGS="--bind=fd://3 --daemon False --workers=${GUNICORN_WORKERS:-4}"
 
 echo "→ Launching WGDashboard (Gunicorn → FD 3)…"
 # 5) Start the dashboard and block
