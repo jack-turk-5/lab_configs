@@ -6,8 +6,8 @@ After=wireguard.socket
 [Container]
 Image=localhost/wireguard/wg-custom:latest
 ContainerName=wireguard
-Volume=boringtun-data:/etc/wireguard:Z:U
-Volume=dashboard-data:/data:Z:U
+Volume=boringtun-data:/etc/wireguard:Z,U
+Volume=dashboard-data:/data:Z,U
 Network=wireguard-internal.network
 AddDevice=/dev/net/tun:/dev/net/tun:rwm
 AddCapability=NET_ADMIN NET_RAW
