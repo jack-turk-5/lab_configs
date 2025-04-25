@@ -60,10 +60,6 @@ else
   sed -i "s|^app_port = .*|app_port = ${wgd_port:-10086}|"               "$CONFIG"
 fi
 
-# Fix file permissions
-chmod 600 /etc/wireguard/wg0.conf
-chmod 600 /etc/wireguard/privatekey /etc/wireguard/publickey
-
 # 3) Bring up wg0 via Boringtun
 echo "→ Starting Boringtun userspace VPN…"
 # Remove any stale wg0 interface to avoid 'already exists'
@@ -78,6 +74,10 @@ PrivateKey = $(cat privatekey)
 ListenPort  = 51820
 EOF
 fi
+
+# Fix file permissions
+chmod 600 /etc/wireguard/wg0.conf
+chmod 600 /etc/wireguard/privatekey /etc/wireguard/publickey
 
 boringtun-cli --foreground wg0 &  # spawn Boringtun
 sleep 0.1
