@@ -68,11 +68,10 @@ echo "Launching WGDashboard via Gunicorn on systemd socket (FD 3)…"
 cd "$WGDASH/src"
 . venv/bin/activate
 
-# Disable daemonization (stay in foreground under systemd)
-sed -i 's/^daemon = True/daemon = False/' gunicorn.conf.py   # overrides the default daemon=True :contentReference[oaicite:1]{index=1}
 
 exec gunicorn \
   --config ./gunicorn.conf.py \
+  --daemon false \
   --bind fd://3 \
   --workers ${GUNICORN_WORKERS:-4} \
   --timeout ${GUNICORN_TIMEOUT:-120}
