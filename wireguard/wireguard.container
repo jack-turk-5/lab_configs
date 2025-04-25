@@ -11,6 +11,7 @@ Volume=dashboard-data:/data:Z,U
 Network=wireguard-internal.network
 AddDevice=/dev/net/tun:/dev/net/tun:rwm
 AddCapability=NET_ADMIN NET_RAW
+Environment="public_ip=3.15.122.25"
 Environment="WG_QUICK_USERSPACE_IMPLEMENTATION=boringtun-cli"
 Environment="WG_SUDO=1"
 
