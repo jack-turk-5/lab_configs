@@ -4,18 +4,19 @@ RUN apk add --no-cache build-base musl-dev linux-headers \
     && cargo install --locked boringtun-cli \
     && apk del build-base musl-dev linux-headers
 
-# === Stage 2: Final Image on WGDashboard Base ===
+# === Stage 2: WGDashboard + Boringtun + minimal tools ===
 FROM docker.io/donaldzou/wgdashboard:latest
 
-# Copy Boringtun binary from builder stage
-COPY --from=builder /usr/local/cargo/bin/boringtun-cli /usr/bin/boringtun-cli
-
-# Add dependencies and allow net admin
-RUN apk add --no-cache socat wireguard-tools iproute2 bash libcap-setcap \
+# Install runtime WireGuard tools & capabilities
+USER root
+RUN apk add --no-cache wireguard-tools iproute2 bash libcap-setcap \
     && setcap cap_net_admin+epi /usr/bin/boringtun-cli
 
-# Add our unified entrypoint
-COPY entrypoint.sh /entrypoint-custom.sh
-RUN chmod +x /entrypoint-custom.sh /entrypoint.sh
+# Copy Boringtun CLI from builder
+COPY --from=builder /usr/local/cargo/bin/boringtun-cli /usr/bin/boringtun-cli
 
-ENTRYPOINT ["/entrypoint-custom.sh"]
+# Add our unified entrypoint
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
