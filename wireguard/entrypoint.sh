@@ -73,9 +73,11 @@ echo "Launching WGDashboard via Gunicorn on systemd socket (FD 3)…"
 cd "$WGDASH/src"
 . venv/bin/activate
 
+sed -i 's/daemon = True/daemon = False/' gunicorn.conf.py
+
 exec gunicorn \
   --config ./gunicorn.conf.py \
   --bind fd://3 \
   --workers ${GUNICORN_WORKERS:-4} \
   --timeout ${GUNICORN_TIMEOUT:-120} \
-  wgd_app:app
+  wsgi_app=dashboard:app
