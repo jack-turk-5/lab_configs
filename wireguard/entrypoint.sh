@@ -4,7 +4,7 @@ set -e
 # 1) Forward systemd socket FD 3 into the dashboard’s HTTP port
 #    Use 0.0.0.0 so host.containers.internal can reach it
 socat -d -d \
-  FD:3 \
+  FD:3,fork,reuseaddr \
   TCP:127.0.0.1:${wgd_port:-10086},retry,interval=0.5,forever &
 
 # 3) Bring up wg0 via Boringtun
