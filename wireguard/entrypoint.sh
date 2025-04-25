@@ -60,6 +60,7 @@ EOF
 fi
 
 boringtun-cli --foreground wg0 &                              # spawn Boringtun :contentReference[oaicite:5]{index=5}
+cd "$WGDASH/src"
 sed -i 's/^daemon = True/daemon = False/' gunicorn.conf.py
 
 # Override bind address in config (must match FD 3) :contentReference[oaicite:6]{index=6}
