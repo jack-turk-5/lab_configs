@@ -3,7 +3,7 @@ set -e
 
 # 1) Forward systemd socket FD 3 into the dashboard’s HTTP port
 #    Use 0.0.0.0 so host.containers.internal can reach it
-socat FD:3 TCP:127.0.0.1:${wgd_port:-10086} &
+socat FD:3 TCP:[::]:${wgd_port:-10086} &
 
 # 3) Bring up wg0 via Boringtun
 cd /etc/wireguard
