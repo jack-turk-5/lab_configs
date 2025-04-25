@@ -1,7 +1,7 @@
 [Unit]
 Description=BoringTun VPN (userspace WireGuard)
+Requires=boringtun.socket
 After=boringtun.socket
-Wants=boringtun.socket
 
 [Container]
 Image=localhost/wireguard/boringtun:latest
