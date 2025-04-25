@@ -9,7 +9,7 @@ FROM docker.io/donaldzou/wgdashboard:latest
 
 # Install runtime dependencies
 USER root
-RUN apk add --no-cache socat wireguard-tools iproute2 bash \
+RUN apk add --no-cache socat wireguard-tools iproute2 bash libcap-setcap \
     && setcap cap_net_admin+epi /usr/bin/boringtun-cli
 
 # Copy Boringtun binary from builder stage
