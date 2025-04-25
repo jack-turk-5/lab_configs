@@ -76,7 +76,7 @@ cd "$WGDASH/src"
 sed -i 's/^daemon = True/daemon = False/' gunicorn.conf.py
 
 echo "→ Launching WGDashboard (Gunicorn → FD 3)…"
-export GUNICORN_CMD_ARGS="--bind=fd://3 --daemon=false --workers=${GUNICORN_WORKERS:-4}"
+export GUNICORN_CMD_ARGS="--bind=fd://3 --daemon=False --workers=${GUNICORN_WORKERS:-4}"
 sed -i 's|sudo "\$venv_gunicorn|"\$venv_gunicorn|g' "$WGDASH/src/wgd.sh"
 bash ./wgd.sh start
 ensure_blocking
