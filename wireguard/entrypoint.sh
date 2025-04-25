@@ -22,6 +22,8 @@ CONFIG=/data/wg-dashboard.ini
 
 echo "------------------------- START ----------------------------"
 echo "Starting WireGuard Dashboard container..."
+export WG_QUICK_USERSPACE_IMPLEMENTATION=boringtun-cli
+export WG_SUDO=1
 
 # 1) replicate ensure_installation()
 echo "→ Installing/updating WGDashboard…"
