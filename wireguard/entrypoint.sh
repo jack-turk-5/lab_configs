@@ -29,4 +29,4 @@ ip link set wg0 up
 wg setconf wg0 wg0.conf
 
 # 4) Exec the original WGDashboard entrypoint (installs & starts HTTP service)
-exec /entrypoint-dashboard.sh
+exec /entrypoint.sh

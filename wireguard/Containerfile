@@ -17,11 +17,8 @@ COPY --from=builder /usr/local/cargo/bin/boringtun-cli /usr/bin/boringtun-cli
 RUN apk add --no-cache socat wireguard-tools iproute2 bash libcap-setcap \
     && setcap cap_net_admin+epi /usr/bin/boringtun-cli
 
-# Preserve the upstream entrypoint
-COPY --from=0 /entrypoint.sh /entrypoint-dashboard.sh
-
 # Add our unified entrypoint
-COPY entrypoint-custom.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh /entrypoint-dashboard.sh
+COPY entrypoint.sh /entrypoint-custom.sh
+RUN chmod +x /entrypoint-custom.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint-custom.sh"]
