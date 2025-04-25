@@ -75,9 +75,7 @@ boringtun-cli --foreground wg0 &                              # spawn Boringtun 
 cd "$WGDASH/src"
 sed -i 's/^daemon = True/daemon = False/' gunicorn.conf.py
 
-# Override bind address in config (must match FD 3) :contentReference[oaicite:6]{index=6}
-# If your gunicorn.conf.py has a bind setting, replace it; otherwise this is a no-op
-sed -i 's|^bind *=.*|bind = "fd://3"|' gunicorn.conf.py || true
+export GUNICORN_CMD_ARGS="--bind=fd://3 --daemon=false --workers=${GUNICORN_WORKERS:-4}"
 
 echo "→ Launching WGDashboard (Gunicorn → FD 3)…"
 bash ./wgd.sh start
