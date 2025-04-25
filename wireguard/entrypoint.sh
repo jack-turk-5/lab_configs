@@ -4,55 +4,52 @@ set -e
 ### Trap SIGTERM for graceful shutdown ###
 trap 'echo "[WGDashboard] Stopping..."; kill $gunicorn_pid 2>/dev/null; exit 0' SIGTERM
 
-### 1) Ensure installation (from upstream entrypoint) ###
+WGDASH=/opt/wireguarddashboard    # upstream app root
+CONFIG=/data/wg-dashboard.ini
+
 echo "------------------------- START ----------------------------"
 echo "Quick-installing WGDashboard dependencies and venv…"
 
-WGDASH=/opt/wireguarddashboard    # upstream APP root
-config_file=/data/wg-dashboard.ini
-
-# Make sure the wgd.sh script is executable, remove 'clear' for logging
+# 1) Prepare upstream entrypoint logic
 chmod +x "$WGDASH/src/wgd.sh"
 cd "$WGDASH/src"
+# remove any 'clear' calls so logs remain visible
 sed -i '/clear/d' ./wgd.sh
 
-# Link or create data directories & config
+# link data dirs & config
 mkdir -p /data/db
 ln -sf /data/db ./db
-touch "$config_file"
-ln -sf "$config_file" ./wg-dashboard.ini
+touch "$CONFIG"
+ln -sf "$CONFIG" ./wg-dashboard.ini
 
-# Create Python venv & relocate psutil/bcrypt into it
+# create a Python venv and relocate heavy deps into it
 python3 -m venv venv
 mv /usr/lib/python3.12/site-packages/psutil* venv/lib/python3.12/site-packages/
 mv /usr/lib/python3.12/site-packages/bcrypt* venv/lib/python3.12/site-packages/
 
-# Run upstream install (installs Python deps & WireGuard tools)
+# run upstream install (installs Python deps, wireguard-tools, etc.)
 ./wgd.sh install
 
-### 2) Initialize wg-dashboard.ini defaults (from upstream set_envvars) ###
 echo "------------- SETTING ENVIRONMENT VARIABLES ----------------"
-if [ ! -s "$config_file" ]; then
-  cat > "$config_file" <<EOF
+# 2) Seed or update wg-dashboard.ini defaults
+if [ ! -s "$CONFIG" ]; then
+  cat > "$CONFIG" <<EOF
 [Peers]
 peer_global_dns   = ${global_dns:-1.1.1.1}
-remote_endpoint   = ${public_ip:-$(curl -s ifconfig.me)}
+remote_endpoint   = ${public_ip:-$(curl -fs ifconfig.me)}
 peer_endpoint_allowed_ip = 0.0.0.0/0
 
 [Server]
 app_port = ${wgd_port:-10086}
 EOF
 else
-  # Update DNS if changed
-  sed -i "s/^peer_global_dns = .*/peer_global_dns = ${global_dns}/" "$config_file"
-  # Update remote_endpoint if set
-  sed -i "s/^remote_endpoint = .*/remote_endpoint = ${public_ip}/" "$config_file"
-  # Update port if changed
-  sed -i "s/^app_port = .*/app_port = ${wgd_port}/" "$config_file"
+  sed -i "s|^peer_global_dns = .*|peer_global_dns = ${global_dns:-1.1.1.1}|" "$CONFIG"
+  sed -i "s|^remote_endpoint = .*|remote_endpoint = ${public_ip}| " "$CONFIG"
+  sed -i "s|^app_port = .*|app_port = ${wgd_port:-10086}|" "$CONFIG"
 fi
 
-### 3) Bring up wg0 via Boringtun (userspace WireGuard) ###
 echo "Starting Boringtun userspace VPN…"
+# 3) Bring up wg0 via Boringtun
 cd /etc/wireguard
 if [ ! -f privatekey ]; then
   umask 077
@@ -71,8 +68,9 @@ ip addr add ${WG_IP:-10.8.0.1}/24 dev wg0
 ip link set wg0 up
 wg setconf wg0 wg0.conf
 
-### 4) Activate Python venv and start Gunicorn on FD 3 ###
 echo "Launching WGDashboard via Gunicorn on systemd socket (FD 3)…"
+# 4) Activate venv and exec Gunicorn bound to FD 3
+cd "$WGDASH/src"
 . venv/bin/activate
 
 exec gunicorn \
