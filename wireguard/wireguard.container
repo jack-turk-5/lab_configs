@@ -1,0 +1,18 @@
+[Unit]
+Description=Userspace WireGuard VPN via Boringtun
+Requires=wireguard.socket
+After=wireguard.socket
+
+[Container]
+Image=localhost/wireguard/wg-custom:latest
+ContainerName=wireguard
+Volume=boringtun-data:/etc/wireguard:Z
+Volume=dashboard-data:/data:Z
+Network=wireguard.network
+AddDevice=/dev/net/tun:/dev/net/tun:rwm
+AddCapability=NET_ADMIN NET_RAW
+Environment="WG_QUICK_USERSPACE_IMPLEMENTATION=boringtun-cli"
+Environment="WG_SUDO=1"
+
+[Install]
+WantedBy=default.target

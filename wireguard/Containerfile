@@ -1,0 +1,25 @@
+# === Stage 1: Build Boringtun CLI ===
+FROM docker.io/rust:alpine AS builder
+RUN apk add --no-cache build-base musl-dev linux-headers \
+    && cargo install --locked boringtun-cli \
+    && apk del build-base musl-dev linux-headers
+
+# === Stage 2: Final Image on WGDashboard Base ===
+FROM docker.io/donaldzou/wgdashboard:latest
+
+# Install runtime dependencies
+USER root
+RUN apk add --no-cache socat wireguard-tools iproute2 bash \
+    && setcap cap_net_admin+epi /usr/bin/boringtun-cli
+
+# Copy Boringtun binary from builder stage
+COPY --from=builder /usr/local/cargo/bin/boringtun-cli /usr/bin/boringtun-cli
+
+# Preserve the upstream entrypoint
+COPY --from=0 /entrypoint.sh /entrypoint-dashboard.sh
+
+# Add our unified entrypoint
+COPY entrypoint-custom.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh /entrypoint-dashboard.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

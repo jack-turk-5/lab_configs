@@ -7,11 +7,11 @@
 
 #### User Tasks
 - Socket and network go under `~/.config/systemd/user/`
-- `boringtun.container` and `wg-dahboard.container` go under `~/.config/containers/systemd/`
+- `wireguard.containe` and `wireguard.network` go under `~/.config/containers/systemd/`
 - Make sure lingering is enabled (see `../podman/setup.md`)
 - Reload systemctl user daemon `systemctl --user daemon-reload`
-- Manually enable the sockets `systemctl --user enable --now boringtun.socket wg-dashboard.socket` 
-- Manually start containers `systemctl --user start boringtun wg-dashboard`
+- Manually enable the sockets `systemctl --user enable --now wireguard.socket` 
+- Manually start containers `systemctl --user start wireguard`
 
 #### Iptables For Outside Internet VPN
 ```bash
