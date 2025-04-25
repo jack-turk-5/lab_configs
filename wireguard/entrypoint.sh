@@ -1,6 +1,18 @@
 #!/usr/bin/env sh
 set -e
 
+ensure_blocking() {
+  sleep 1s
+  echo -e "\nEnsuring container continuation."
+  local logdir="${WGDASH}/src/log"
+  latestErrLog=$(find "$logdir" -name "error_*.log" -type f -print | sort -r | head -n 1)
+  if [ -n "$latestErrLog" ]; then
+    tail -f "$latestErrLog" & wait $!
+  else
+    echo "No log files found to tail. Something went wrong, exiting..."
+  fi
+}
+
 # ----- TERM Trap for graceful shutdown -----
 trap 'echo "[WGDashboard] Stopping..."; bash "$WGDASH/src/wgd.sh" stop; exit 0' SIGTERM
 
@@ -69,14 +81,4 @@ sed -i 's|^bind *=.*|bind = "fd://3"|' gunicorn.conf.py || true
 
 echo "→ Launching WGDashboard (Gunicorn → FD 3)…"
 bash ./wgd.sh start
-
-# After starting the dashboard (e.g., via wgd.sh start or exec gunicorn…)
-echo "→ Ensuring container stays alive by tailing logs…"
-
-# 1) Identify the latest error log in the WGDashboard log directory
-LOGDIR="/opt/wireguarddashboard/src/log"
-LATEST_LOG=$(find "$LOGDIR" -type f -name 'error_*.log' | sort -r | head -n1)
-
-if [ -z "$LATEST_LOG" ]; then
-  echo "[ERROR] No error log found in $LOGDIR. Keeping container alive via /dev/null."
-fi
+ensure_blocking
