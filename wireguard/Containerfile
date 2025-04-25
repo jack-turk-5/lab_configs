@@ -19,6 +19,6 @@ RUN apk add --no-cache socat wireguard-tools iproute2 bash libcap-setcap \
 
 # Add our unified entrypoint
 COPY entrypoint.sh /entrypoint-custom.sh
-RUN chmod +x /entrypoint-custom.sh
+RUN chmod +x /entrypoint-custom.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint-custom.sh"]
