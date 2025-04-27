@@ -36,7 +36,7 @@ RUN apk update && apk add --no-cache \
     apk upgrade
 
 # Copy BoringTun binary from build stage
-COPY --from=boringtun-builder /root/.cargo/bin/boringtun-cli /usr/bin/boringtun-cli
+COPY --from=builder /root/.cargo/bin/boringtun-cli /usr/bin/boringtun-cli
 
 # Create application directories and copy source
 RUN mkdir -p /etc/wireguard /data && mkdir -p ${WGDASH}/src
