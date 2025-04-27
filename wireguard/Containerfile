@@ -1,7 +1,20 @@
-# Stage 1 – Build boringtun (userspace WireGuard) on Alpine
-FROM alpine:latest AS boringtun-builder
-RUN apk add --no-cache cargo && \
-    cargo install --target x86_64-unknown-linux-musl boringtun-cli
+# === Stage 1: Build Boringtun CLI ===
+FROM rust:alpine AS builder
+
+# Install build tools and musl support
+RUN apk add --no-cache \
+      build-base \
+      musl-dev \
+      linux-headers \
+      bash \
+      curl \
+      git
+
+# Install MUSL target for Rust
+RUN rustup target add x86_64-unknown-linux-musl
+
+# Now compile boringtun statically
+RUN cargo install --locked boringtun-cli --target x86_64-unknown-linux-musl
 
 # Stage 2 – Final image
 FROM alpine:latest
