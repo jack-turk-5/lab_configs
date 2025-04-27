@@ -5,11 +5,15 @@ After=forgejo.socket
 
 [Container]
 ContainerName=forgejo
+Image=codeberg.org/forgejo/forgejo:11-rootless
+Network=none
+Volume=forgejo-data:/data:Z,U
 Environment=USER_UID=1001
 Environment=USER_GID=1001
-Image=codeberg.org/forgejo/forgejo:11
-Network=none
-Volume=forgejo-data:/data:Z
+Environment=DISABLE_SSH=false
+Environment=START_SSH_SERVER=true
+Environment=SSH_PORT=3022
+Environment=SSH_DOMAIN=forge.jackturk.dev
 
 [Service]
 Restart=always

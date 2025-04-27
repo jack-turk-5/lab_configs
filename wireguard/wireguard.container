@@ -11,8 +11,14 @@ Volume=dashboard-data:/data:Z,U
 Network=wireguard-internal.network
 AddDevice=/dev/net/tun:/dev/net/tun:rwm
 AddCapability=NET_ADMIN NET_RAW
+Environment=WG_QUICK_USERSPACE_IMPLEMENTATION=boringtun-cli
 Environment=app_ip=127.0.0.1
 Environment=public_ip=127.0.0.1
+Sysctl=net.ipv4.ip_forward=1
+Sysctl=net.ipv6.conf.all.forwarding=1
+
+[Service]
+Restart=always
 
 [Install]
 WantedBy=default.target

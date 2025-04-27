@@ -1,10 +1,10 @@
 ## Instructions for running Forgejo for VCS/Artifactory with Rootless Podman and Sockets
 
 #### Root Tasks
-- Allow SSH on 222 (make sure `Port 22` is explicitly written out before this in the file) by adding to following to `/etc/ssh/sshd_config`
+- Allow SSH on 3022 (make sure `Port 22` is explicitly written out before this in the file) by adding to following to `/etc/ssh/sshd_config`
 ```bash
 # Port 22 # Often commented out, amke sure it is present first
-Port 222
+Port 3022
 PermitRootLogin no
 PasswordAuthentication no
 PubkeyAuthentication yes
@@ -12,7 +12,7 @@ PubkeyAuthentication yes
 
 -  Delegate to Forgejo for authenticating git SSH requests by adding the following to `/etc/ssh/sshd_config`
 ```bash
-Match LocalPort 222
+Match LocalPort 3022
   AllowUsers git
   AuthorizedKeysCommand /usr/local/bin/git-ssh-keys %f %k
   AuthorizedKeysCommandUser root
@@ -51,5 +51,4 @@ sudo adduser --system \
 - Make sure lingering is enabled (see `../podman/setup.md`)
 - Reload systemd user daemon `systemctl --user daemon-reload`
 - Manually enable the sockets `systemctl --user enable --now forgejo.sockt`
-- Manually enable the ssh service `systemctl --user enable --now ssh.service`
 - Manually start container `systemctl --user start forgejo`

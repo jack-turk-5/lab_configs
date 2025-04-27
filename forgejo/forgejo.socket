@@ -3,6 +3,7 @@ Description=Forgejo Socket (Rootless)
 
 [Socket]
 ListenStream=[::]:3000
+ListenStream=[::]:3022
 BindIPv6Only=both
 Service=forgejo.service
 

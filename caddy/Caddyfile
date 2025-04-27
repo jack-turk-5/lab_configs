@@ -1,7 +1,7 @@
 {
   # socket‑activation: fd3=80/tcp, fd4=443/tcp, fd5=443/udp, fd6=admin
   debug
-  admin   fd/6
+  admin fd/6
 }
 
 http://vpn.jackturk.dev forge.jackturk.dev {

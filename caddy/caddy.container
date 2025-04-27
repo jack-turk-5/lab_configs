@@ -13,5 +13,8 @@ Volume=caddy-config:/config:Z
 Volume=caddy-data:/data:Z
 Exec=caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
 
+[Service]
+Restart=always
+
 [Install]
 WantedBy=default.target
