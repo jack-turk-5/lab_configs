@@ -35,8 +35,8 @@
 ### tuple ### allow tcp 222 0.0.0.0/0 any 0.0.0.0/0 in comment=466f7267656a6f20535348
 -A ufw-user-input -p tcp --dport 222 -j ACCEPT
 
-### tuple ### allow tcp 10086 0.0.0.0/0 any 0.0.0.0/0 in
--A ufw-user-input -p tcp --dport 10086 -j ACCEPT
+### tuple ### allow tcp 51819 0.0.0.0/0 any 0.0.0.0/0 in
+-A ufw-user-input -p tcp --dport 51819 -j ACCEPT
 
 ### tuple ### allow tcp 21115 0.0.0.0/0 any 0.0.0.0/0 in
 -A ufw-user-input -p tcp --dport 21115 -j ACCEPT
