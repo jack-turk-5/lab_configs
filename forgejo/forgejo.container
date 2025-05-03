@@ -8,6 +8,7 @@ ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
 Network=none
 UserNS=keep-id
+PodmanArgs=--sdnotify=conmon
 Volume=forgejo-data:/data:Z,U
 Environment=DISABLE_SSH=false
 Environment=START_SSH_SERVER=true
@@ -16,6 +17,8 @@ Environment=SSH_DOMAIN=forge.jackturk.dev
 
 [Service]
 Restart=always
+Type=notify
+NotifyAccess=main
 
 [Install]
 WantedBy=default.target
