@@ -7,7 +7,7 @@ After=forgejo.socket
 ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
 Network=none
-Userns=keep-id
+UserNS=keep-id
 Volume=forgejo-data:/data:Z,U
 Environment=DISABLE_SSH=false
 Environment=START_SSH_SERVER=true
