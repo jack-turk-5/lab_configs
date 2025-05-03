@@ -7,7 +7,7 @@ After=forgejo.socket
 ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
 Network=none
-Userns=keep-id:uid=1001,gid=1001
+UserNS=keep-id:uid=1001,gid=1001
 Volume=forgejo-data:/data:Z,U
 Environment=USER_UID=1001
 Environment=USER_GID=1001
