@@ -19,7 +19,6 @@ Environment=SSH_DOMAIN=forge.jackturk.dev
 Restart=on-failure
 Type=notify
 NotifyAccess=main
-KillMode=process
 
 [Install]
 WantedBy=default.target
