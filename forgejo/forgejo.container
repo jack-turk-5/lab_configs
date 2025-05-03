@@ -7,16 +7,20 @@ After=forgejo.socket
 ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
 Network=none
-UserNS=keep-id
 PodmanArgs=--replace --sdnotify=conmon --log-level=debug
-Volume=forgejo-data:/data:Z,U
+Volume=forgejo-config:/data:Z,U
+Volume=forgejo-repos:/var/lib/gitea:Z,U
+Volume=forgejo-repo-config:/etc/gitea:Z,U
+Volume=/etc/timezone:/etc/timezone:ro
+Volume=/etc/localtime:/etc/localtime:ro
+
 Environment=DISABLE_SSH=false
 Environment=START_SSH_SERVER=true
 Environment=SSH_PORT=3022
 Environment=SSH_DOMAIN=forge.jackturk.dev
 
 [Service]
-Restart=on-failure
+Restart=always
 Type=notify
 NotifyAccess=main
 
