@@ -9,7 +9,7 @@ Image=codeberg.org/forgejo/forgejo:11-rootless
 AddCapability=CAP_SYS_RESOURCE CAP_SETUID CAP_SETGID
 PodmanArgs=--replace --sdnotify=conmon --log-level=debug
 Network=none
-UserNS=keep-id
+UserNS=keep-id:uid=1000,gid=1000
 #UIDMap=0:0:1
 #GIDMap=0:0:1
 #UIDMap=1000:1001:1
