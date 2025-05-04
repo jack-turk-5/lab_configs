@@ -33,6 +33,7 @@ https://vpn.jackturk.dev forge.jackturk.dev {
 }
 
 :3022 {
-    transport tcp
-    reverse_proxy host.containers.internal:3022
+    reverse_proxy host.containers.internal:3022 {
+      transport tcp
+    }
 }
