@@ -9,14 +9,15 @@ Image=codeberg.org/forgejo/forgejo:11-rootless
 AddCapability=CAP_SYS_RESOURCE CAP_SETUID CAP_SETGID
 PodmanArgs=--replace --sdnotify=conmon --log-level=debug
 Network=none
-UIDMap=0:0:1
-GIDMap=0:0:1
-UIDMap=1000:1001:1
-GIDMap=1000:1001:1
-UIDMap=1002:165536:64536
-GIDMap=1002:165536:64536
-Volume=forgejo-repo-config:/var/lib/gitea:Z,U
+UserNS=keep-id
+#UIDMap=0:0:1
+#GIDMap=0:0:1
+#UIDMap=1000:1001:1
+#GIDMap=1000:1001:1
+#UIDMap=1002:165536:64536
+#GIDMap=1002:165536:64536
 Volume=forgejo-repo:/etc/gitea:Z,U
+Volume=forgejo-repo-config:/var/lib/gitea:Z,U
 Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
 
