@@ -6,6 +6,7 @@ After=forgejo.socket
 [Container]
 ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
+PodmanArgs=--replace --sdnotify=conmon --log-level=debug
 Network=none
 User=1001:1001
 Volume=forgejo-repos:/var/lib/gitea:Z,U
@@ -23,7 +24,6 @@ Environment=SSH_DOMAIN=forge.jackturk.dev
 
 [Service]
 Restart=on-failure
-PodmanArgs=--replace --sdnotify=conmon --log-level=debug
 Type=notify
 NotifyAccess=main
 
