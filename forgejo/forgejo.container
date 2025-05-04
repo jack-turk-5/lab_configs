@@ -21,7 +21,7 @@ Environment=SSH_PORT=3022
 Environment=SSH_DOMAIN=forge.jackturk.dev
 
 [Service]
-Restart=always
+Restart=on-failure
 Type=notify
 NotifyAccess=main
 
