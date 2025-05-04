@@ -21,6 +21,8 @@ Volume=forgejo-repo-config:/var/lib/gitea:Z,U
 Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
 
+Environment=USER_UID=1001
+Environment=USER_GID=1001
 Environment=ENABLE_PUSH_CREATE_USER=true
 Environment=DISABLE_SSH=false
 Environment=START_SSH_SERVER=true
