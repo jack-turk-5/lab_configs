@@ -7,7 +7,7 @@ After=forgejo.socket
 ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
 Network=none
-User=1024:100
+UserNS=keep-id
 PodmanArgs=--replace --sdnotify=conmon --log-level=debug
 Volume=forgejo-config:/data:Z,U
 
