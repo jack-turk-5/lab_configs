@@ -6,17 +6,11 @@ After=forgejo.socket
 [Container]
 ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
-AddCapability=CAP_SYS_RESOURCE CAP_SETUID CAP_SETGID
+AddCapability=CAP_SYS_RESOURCE
 PodmanArgs=--replace --sdnotify=conmon --log-level=debug
 Network=none
-UserNS=keep-id:uid=1000,gid=1000
-#UIDMap=0:0:1
-#GIDMap=0:0:1
-#UIDMap=1000:1001:1
-#GIDMap=1000:1001:1
-#UIDMap=1002:165536:64536
-#GIDMap=1002:165536:64536
-Volume=forgejo-repo:/etc/gitea:Z,U
+UserNS=keep-id
+Volume=forgejo-config:/var/lib/gitea/custom:Z,U
 Volume=forgejo-repo-config:/var/lib/gitea:Z,U
 Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
@@ -28,7 +22,6 @@ Environment=SSH_PORT=3022
 Environment=SSH_DOMAIN=forge.jackturk.dev
 Environment=ROOT_URL=https://forge.jackturk.dev
 Environment=REVERSE_PROXY_TRUSTED_PROXIES=0.0.0.0/0,::/0
-Environment=ENABLE_REVERSE_PROXY_AUTHENTICATION=true
 
 [Service]
 Restart=on-failure
