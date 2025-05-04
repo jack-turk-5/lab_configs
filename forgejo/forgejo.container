@@ -9,7 +9,7 @@ Image=codeberg.org/forgejo/forgejo:11-rootless
 PodmanArgs=--replace --sdnotify=conmon --log-level=debug
 Network=none
 User=1001:1001
-Volume=forgejo-repos:/var/lib/gitea:Z,U
+Volume=forgejo-repo-config:/var/lib/gitea/custom:Z,U
 Volume=forgejo-repo-config:/etc/gitea:Z,U
 Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
@@ -22,6 +22,7 @@ Environment=START_SSH_SERVER=true
 Environment=SSH_PORT=3022
 Environment=SSH_DOMAIN=forge.jackturk.dev
 Environment=ROOT_URL=https://forge.jackturk.dev
+Environment=REVERSE_PROXY_TRUSTED_PROXIES=0.0.0.0/0,::/0
 Environment=ENABLE_REVERSE_PROXY_AUTHENTICATION=true
 
 [Service]
