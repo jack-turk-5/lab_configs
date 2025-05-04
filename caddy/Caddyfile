@@ -32,9 +32,3 @@ https://vpn.jackturk.dev forge.jackturk.dev {
     }          
   }
 }
-
-layer4 {
-  tcp :3022 {
-    to host.containers.internal:3022
-  }
-}
