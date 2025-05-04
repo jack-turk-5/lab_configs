@@ -8,7 +8,6 @@ ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
 Network=none
 User=1001:1001
-PodmanArgs=--replace --sdnotify=conmon --log-level=debug
 Volume=forgejo-repos:/var/lib/gitea:Z,U
 Volume=forgejo-repo-config:/etc/gitea:Z,U
 Volume=/etc/timezone:/etc/timezone:ro
@@ -24,6 +23,7 @@ Environment=SSH_DOMAIN=forge.jackturk.dev
 
 [Service]
 Restart=on-failure
+PodmanArgs=--replace --sdnotify=conmon --log-level=debug
 Type=notify
 NotifyAccess=main
 
