@@ -24,10 +24,11 @@ https://vpn.jackturk.dev forge.jackturk.dev {
 
   @forge host forge.jackturk.dev
   handle @forge {
-    reverse_proxy host.containers.internal:3000
-    header_up Host {host}                                       
-    header_up X-Real-IP {remote}                                      
-    header_up Authorization {>Authorization}            
+    reverse_proxy host.containers.internal:3000 {
+      header_up Host {host}                                       
+      header_up X-Real-IP {remote}                                      
+      header_up Authorization {>Authorization}  
+    }          
   }
 }
 
