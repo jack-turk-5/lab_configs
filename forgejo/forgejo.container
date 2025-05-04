@@ -21,7 +21,8 @@ Environment=DISABLE_SSH=false
 Environment=START_SSH_SERVER=true
 Environment=SSH_PORT=3022
 Environment=SSH_DOMAIN=forge.jackturk.dev
-Environment=GITEA__server__ROOT_URL="https://forge.jackturk.dev/"
+Environment=ROOT_URL=https://forge.jackturk.dev
+Environment=ENABLE_REVERSE_PROXY_AUTHENTICATION=true
 
 [Service]
 Restart=on-failure
