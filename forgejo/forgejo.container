@@ -6,10 +6,9 @@ After=forgejo.socket
 [Container]
 ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
-Network=forgejo.network
+Network=none
 UserNS=keep-id:uid=1001,gid=1001
 PodmanArgs=--replace --sdnotify=conmon --log-level=debug
-Volume=forgejo-config:/data:Z,U
 Volume=forgejo-repos:/var/lib/gitea:Z,U
 Volume=forgejo-repo-config:/etc/gitea:Z,U
 Volume=/etc/timezone:/etc/timezone:ro
@@ -17,6 +16,9 @@ Volume=/etc/localtime:/etc/localtime:ro
 
 Environment=USER_UID=1001
 Environment=USER_GID=1001
+Environment=GITEA__database__DB_TYPE=sqlite3
+Environment=GITEA__database__PATH=/var/lib/gitea/data/gitea.db
+Environment=ENABLE_PUSH_CREATE_USER=true
 Environment=DISABLE_SSH=false
 Environment=START_SSH_SERVER=true
 Environment=SSH_PORT=3022
