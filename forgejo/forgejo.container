@@ -8,8 +8,8 @@ ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
 PodmanArgs=--replace --sdnotify=conmon --log-level=debug
 Network=none
-UIDMap=0:1001:1
-GIDMap=0:1001:1
+UIDMap=1000:1001:1
+GIDMap=1000:1001:1
 UIDMap=1:165536:65536
 GIDMap=1:165536:65536
 Volume=forgejo-repo-config:/var/lib/gitea:Z,U
@@ -17,8 +17,6 @@ Volume=forgejo-repo:/etc/gitea:Z,U
 Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
 
-Environment=USER_UID=1001
-Environment=USER_GID=1001
 Environment=ENABLE_PUSH_CREATE_USER=true
 Environment=DISABLE_SSH=false
 Environment=START_SSH_SERVER=true
