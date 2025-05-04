@@ -17,4 +17,4 @@ ProtectSystem=full
 ProtectHome=read-only
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
