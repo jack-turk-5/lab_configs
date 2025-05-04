@@ -1,0 +1,20 @@
+[Unit]
+Description=bypass4netns daemon for rootless container networking
+Documentation=https://github.com/rootless-containers/bypass4netns
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/bypass4netnsd
+Restart=on-failure
+RestartSec=5s
+
+# Minimal capabilities needed for socket handling
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW
+NoNewPrivileges=yes
+ProtectSystem=full
+ProtectHome=read-only
+
+[Install]
+WantedBy=multi-user.target
