@@ -6,6 +6,7 @@ After=forgejo.socket
 [Container]
 ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
+AddCapability=CAP_SYS_RESOURCE CAP_SETUID CAP_SETGID
 PodmanArgs=--replace --sdnotify=conmon --log-level=debug
 Network=none
 UIDMap=0:0:1
