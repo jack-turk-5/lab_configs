@@ -9,9 +9,7 @@ ExecStart=/usr/local/bin/bypass4netnsd
 Restart=on-failure
 RestartSec=5s
 
-# Minimal capabilities needed for socket handling
-CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW
-AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW
+# Do not drop any capabilities
 NoNewPrivileges=yes
 ProtectSystem=full
 ProtectHome=read-only
