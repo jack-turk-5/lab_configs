@@ -19,7 +19,9 @@ https://vpn.jackturk.dev forge.jackturk.dev {
 
   @vpn host vpn.jackturk.dev
   handle @vpn {
-    reverse_proxy host.containers.internal:51819
+    reverse_proxy host.containers.internal:51819 {
+      header_up Authorization {>Authorization}
+    }
   }
 
   @forge host forge.jackturk.dev
