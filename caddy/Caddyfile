@@ -17,7 +17,7 @@ https://vpn.jackturk.dev forge.jackturk.dev {
   }
   encode     gzip
 
-  @vpn host vpn.jackturk.dev
+  @vpn host vpn.jackturk.dev {
   handle @vpn {
     @preflight {
       method OPTIONS
