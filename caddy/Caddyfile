@@ -19,16 +19,17 @@ https://vpn.jackturk.dev forge.jackturk.dev {
 
   @vpn host vpn.jackturk.dev
   handle @vpn {
-      @preflight {
+    @preflight {
       method OPTIONS
       path   /login* /api/* /serverinfo
     }
     handle @preflight {
-      respond 204 {
+      respond "" 204 {
         header Access-Control-Allow-Origin  "{>Origin}"
         header Access-Control-Allow-Methods "GET, POST, OPTIONS"
         header Access-Control-Allow-Headers "Authorization, Content-Type"
         header Access-Control-Allow-Credentials "true"
+      }
     }
   }
 
