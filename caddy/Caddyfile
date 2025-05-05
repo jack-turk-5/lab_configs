@@ -1,63 +1,51 @@
 {
+  # socket‑activation: fd3=80/tcp, fd4=443/tcp, fd5=443/udp, fd6=admin
   debug
-  # socket‑activation: fd3=80, fd4=443, fd5=443/udp, fd6=admin
-  admin   fd/6
+  admin fd/6
 }
 
-# Redirect HTTP to HTTPS
-http://vpn.jackturk.dev {
+http://vpn.jackturk.dev forge.jackturk.dev {
   bind fd/3 {
     protocols h1
   }
-  redir https://vpn.jackturk.dev{uri} permanent
+  redir https://{host}{uri} permanent
 }
 
-# TLS site block for both vpn and forge hosts
-https://vpn.jackturk.dev, forge.jackturk.dev {
-  bind fd/4 {
-    protocols h1 h2
+https://vpn.jackturk.dev forge.jackturk.dev {
+  bind       fd/4 { 
+    protocols h1 h2 
   }
-  encode gzip
+  encode     gzip
 
-  # 1) Handle CORS preflight OPTIONS for your login+API paths
-  @preflight {
-    method OPTIONS
-    path   /login* /api/* /serverinfo
-  }
-  handle @preflight {
-    respond "" 204 {
-      # CORS response headers
-      header_up Access-Control-Allow-Origin  "{>Origin}"
-      header_up Access-Control-Allow-Methods "GET, POST, OPTIONS"
-      header_up Access-Control-Allow-Headers "Authorization, Content-Type"
-      header_up Access-Control-Allow-Credentials "true"
+  @vpn host vpn.jackturk.dev {
+    @preflight {
+      method OPTIONS
+      path   /login* /api/* /serverinfo
+    }
+    # respond to any matched OPTIONS with 204 + CORS headers
+    respond @preflight 204 {
+      header Access-Control-Allow-Origin      "{>Origin}"
+      header Access-Control-Allow-Methods     "GET, POST, OPTIONS"
+      header Access-Control-Allow-Headers     "Authorization, Content-Type"
+      header Access-Control-Allow-Credentials "true"
+    }
+    handle @vpn {
+      reverse_proxy /* host.containers.internal:51819 {
+        header_up Host {host}                                       
+        header_up X-Real-IP {remote}
+        header_up Authorization {>Authorization}
+      }
     }
   }
 
-  # 2) WireGuard‑Pro UI & API on vpn.jackturk.dev
-  @vpn {
-    host vpn.jackturk.dev
-  }
-  handle @vpn {
-    reverse_proxy /* host.containers.internal:51819 {
-      header_up Host          {host}
-      header_up X-Real-IP     {remote}
-      header_up Authorization {>Authorization}
-      header_up Origin        {>Origin}
-    }
-  }
-
-  # 3) Forge app on forge.jackturk.dev
-  @forge {
-    host forge.jackturk.dev
-  }
+  @forge host forge.jackturk.dev
   handle @forge {
-    reverse_proxy /* host.containers.internal:3000 {
-      header_up Host          {host}
-      header_up X-Real-IP     {remote}
-      header_up Upgrade       {>Upgrade}
-      header_up Connection    {>Connection}
-      header_up Authorization {>Authorization}
-    }
+    reverse_proxy host.containers.internal:3000 {
+      header_up Host {host}                                       
+      header_up X-Real-IP {remote}  
+      header_up Upgrade {>Upgrade}
+      header_up Connection {>Connection}                                    
+      header_up Authorization {>Authorization}  
+    }          
   }
 }
