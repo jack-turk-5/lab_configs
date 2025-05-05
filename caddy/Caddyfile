@@ -17,24 +17,21 @@ https://vpn.jackturk.dev forge.jackturk.dev {
   }
   encode     gzip
 
-  @preflight method OPTIONS {
-    path   /login* /api/* /serverinfo
-    # respond to any matched OPTIONS with 204 + CORS headers
-    respond @preflight 204 {
-      header Access-Control-Allow-Origin      "{>Origin}"
-      header Access-Control-Allow-Methods     "GET, POST, OPTIONS"
-      header Access-Control-Allow-Headers     "Authorization, Content-Type"
-      header Access-Control-Allow-Credentials "true"
-    }
+  @preflight method OPTIONS
+  # respond to any matched OPTIONS with 204 + CORS headers
+  respond @preflight 204 {
+    header Access-Control-Allow-Origin      "{>Origin}"
+    header Access-Control-Allow-Methods     "GET, POST, OPTIONS"
+    header Access-Control-Allow-Headers     "Authorization, Content-Type"
+    header Access-Control-Allow-Credentials "true"
   }
 
-  @vpn host vpn.jackturk.dev {
-    handle @vpn {
-      reverse_proxy /* host.containers.internal:51819 {
-        header_up Host {host}                                       
-        header_up X-Real-IP {remote}
-        header_up Authorization {>Authorization}
-      }
+  @vpn host vpn.jackturk.dev
+  handle @vpn {
+    reverse_proxy /* host.containers.internal:51819 {
+      header_up Host {host}                                       
+      header_up X-Real-IP {remote}
+      header_up Authorization {>Authorization}
     }
   }
 
