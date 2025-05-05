@@ -19,6 +19,19 @@ https://vpn.jackturk.dev forge.jackturk.dev {
 
   @vpn host vpn.jackturk.dev
   handle @vpn {
+      @preflight {
+      method OPTIONS
+      path   /login* /api/* /serverinfo
+    }
+    handle @preflight {
+      respond "OK" 204 {
+        header Access-Control-Allow-Origin  "{>Origin}"
+        header Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        header Access-Control-Allow-Headers "Authorization, Content-Type"
+        header Access-Control-Allow-Credentials "true"
+    }
+  }
+
     reverse_proxy /* host.containers.internal:51819 {
       header_up Host {host}                                       
       header_up X-Real-IP {remote}
