@@ -1,50 +1,53 @@
 {
-  # socket‑activation: fd3=80/tcp, fd4=443/tcp, fd5=443/udp, fd6=admin
   debug
-  admin fd/6
+  # socket‑activation: fd3=80, fd4=443, fd5=443/udp, fd6=admin
+  admin   fd/6
 }
 
-http://vpn.jackturk.dev forge.jackturk.dev {
+# Redirect HTTP to HTTPS
+http://vpn.jackturk.dev {
   bind fd/3 {
     protocols h1
   }
-  redir https://{host}{uri} permanent
+  redir https://vpn.jackturk.dev{uri} permanent
 }
 
-https://vpn.jackturk.dev forge.jackturk.dev {
+# TLS site block for both vpn and forge hosts
+https://vpn.jackturk.dev, forge.jackturk.dev {
   bind fd/4 {
     protocols h1 h2
   }
   encode gzip
 
-  # 1) Preflight OPTIONS for /login, /api/*, /serverinfo
+  # 1) Handle CORS preflight OPTIONS for your login+API paths
   @preflight {
     method OPTIONS
     path   /login* /api/* /serverinfo
   }
   handle @preflight {
-    respond 204 {
-      header Access-Control-Allow-Origin  "{>Origin}"
-      header Access-Control-Allow-Methods "GET, POST, OPTIONS"
-      header Access-Control-Allow-Headers "Authorization, Content-Type"
-      header Access-Control-Allow-Credentials "true"
+    respond "" 204 {
+      # CORS response headers
+      header_up Access-Control-Allow-Origin  "{>Origin}"
+      header_up Access-Control-Allow-Methods "GET, POST, OPTIONS"
+      header_up Access-Control-Allow-Headers "Authorization, Content-Type"
+      header_up Access-Control-Allow-Credentials "true"
     }
   }
 
-  # 2) Proxy VPN UI & API
+  # 2) WireGuard‑Pro UI & API on vpn.jackturk.dev
   @vpn {
     host vpn.jackturk.dev
   }
   handle @vpn {
     reverse_proxy /* host.containers.internal:51819 {
-      header_up Host          {host}       # preserve original Host
+      header_up Host          {host}
       header_up X-Real-IP     {remote}
       header_up Authorization {>Authorization}
       header_up Origin        {>Origin}
     }
   }
 
-  # 3) Proxy Forge site
+  # 3) Forge app on forge.jackturk.dev
   @forge {
     host forge.jackturk.dev
   }
