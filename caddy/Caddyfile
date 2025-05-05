@@ -12,42 +12,49 @@ http://vpn.jackturk.dev forge.jackturk.dev {
 }
 
 https://vpn.jackturk.dev forge.jackturk.dev {
-  bind       fd/4 { 
-    protocols h1 h2 
+  bind fd/4 {
+    protocols h1 h2
   }
-  encode     gzip
+  encode gzip
 
-  @vpn host vpn.jackturk.dev {
+  # 1) Preflight OPTIONS for /login, /api/*, /serverinfo
+  @preflight {
+    method OPTIONS
+    path   /login* /api/* /serverinfo
+  }
+  handle @preflight {
+    respond "" 204 {
+      header_up Access-Control-Allow-Origin  "{>Origin}"
+      header_up Access-Control-Allow-Methods "GET, POST, OPTIONS"
+      header_up Access-Control-Allow-Headers "Authorization, Content-Type"
+      header_up Access-Control-Allow-Credentials "true"
+    }
+  }
+
+  # 2) Proxy VPN UI & API
+  @vpn {
+    host vpn.jackturk.dev
+  }
   handle @vpn {
-    @preflight {
-      method OPTIONS
-      path   /login* /api/* /serverinfo
-    }
-    handle @preflight {
-      respond "" 204 {
-        header Access-Control-Allow-Origin  "{>Origin}"
-        header Access-Control-Allow-Methods "GET, POST, OPTIONS"
-        header Access-Control-Allow-Headers "Authorization, Content-Type"
-        header Access-Control-Allow-Credentials "true"
-      }
+    reverse_proxy /* host.containers.internal:51819 {
+      header_up Host          {host}       # preserve original Host
+      header_up X-Real-IP     {remote}
+      header_up Authorization {>Authorization}
+      header_up Origin        {>Origin}
     }
   }
 
-    reverse_proxy /* host.containers.internal:51819 {
-      header_up Host {host}                                       
-      header_up X-Real-IP {remote}
+  # 3) Proxy Forge site
+  @forge {
+    host forge.jackturk.dev
+  }
+  handle @forge {
+    reverse_proxy /* host.containers.internal:3000 {
+      header_up Host          {host}
+      header_up X-Real-IP     {remote}
+      header_up Upgrade       {>Upgrade}
+      header_up Connection    {>Connection}
       header_up Authorization {>Authorization}
     }
-  }
-
-  @forge host forge.jackturk.dev
-  handle @forge {
-    reverse_proxy host.containers.internal:3000 {
-      header_up Host {host}                                       
-      header_up X-Real-IP {remote}  
-      header_up Upgrade {>Upgrade}
-      header_up Connection {>Connection}                                    
-      header_up Authorization {>Authorization}  
-    }          
   }
 }
