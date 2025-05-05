@@ -22,8 +22,7 @@ https://vpn.jackturk.dev forge.jackturk.dev {
     path   /login* /api/* /serverinfo
   }
   # respond to any matched OPTIONS with 204  CORS headers
-  respond @preflight 204 {
-    # use `header` (response headers), not `header_down`
+  respond @preflight 204 "" {
     header Access-Control-Allow-Origin      "{>Origin}"
     header Access-Control-Allow-Methods     "GET, POST, OPTIONS"
     header Access-Control-Allow-Headers     "Authorization, Content-Type"
