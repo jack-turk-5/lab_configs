@@ -17,26 +17,25 @@ https://vpn.jackturk.dev forge.jackturk.dev {
   }
   encode     gzip
 
-  # 1) Preflight OPTIONS
+  # 1) Preflight matcher
   @preflight {
     method OPTIONS
     path   /login* /api/* /serverinfo
   }
-  respond @preflight 204
 
-  # 2) CORS headers on every response to /login and /api/*
-  @cors {
-    path /login* /api/* /serverinfo
-  }
-  # attach CORS headers to real responses so the browser will allow the payload
-  header @cors Access-Control-Allow-Origin "{>Origin}"
-  header @cors Access-Control-Allow-Credentials "true"
+  # 2) For any preflight, remove ETag & disable caching
+  header @preflight -ETag
+  header @preflight Cache-Control "no-store, no-cache"
+
+  # 3) Now respond 204 every time
+  respond @preflight 204
 
   @vpn host vpn.jackturk.dev
   handle @vpn {
     reverse_proxy /* host.containers.internal:51819 {
       header_up Host {host}                                       
       header_up X-Real-IP {remote}
+      header_up Origin {>Origin}
       header_up Authorization {>Authorization}
     }
   }
