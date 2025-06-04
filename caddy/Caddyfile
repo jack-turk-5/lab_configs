@@ -51,10 +51,6 @@ https://vpn.jackturk.dev forge.jackturk.dev {
 		reverse_proxy host.containers.internal:3000 {
 			header_up Host {host}
 			header_up X-Real-IP {remote}
-			# Probably don't need, will have to check
-			header_up Upgrade {upgrade}
-			header_up Connection {connection}
-			header_up Authorization {authorization}
 		}
 	}
 }
