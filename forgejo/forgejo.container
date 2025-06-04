@@ -7,7 +7,6 @@ After=forgejo.socket
 ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
 Network=none
-Notify=true
 User="1024:100"
 Volume=/mnt/repositories/data:/var/lib/gitea
 Volume=/mnt/repositories/conf:/etc/gitea
