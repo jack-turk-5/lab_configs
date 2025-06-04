@@ -1,0 +1,55 @@
+*filter
+:ufw-user-input - [0:0]
+:ufw-user-output - [0:0]
+:ufw-user-forward - [0:0]
+:ufw-before-logging-input - [0:0]
+:ufw-before-logging-output - [0:0]
+:ufw-before-logging-forward - [0:0]
+:ufw-user-logging-input - [0:0]
+:ufw-user-logging-output - [0:0]
+:ufw-user-logging-forward - [0:0]
+:ufw-after-logging-input - [0:0]
+:ufw-after-logging-output - [0:0]
+:ufw-after-logging-forward - [0:0]
+:ufw-logging-deny - [0:0]
+:ufw-logging-allow - [0:0]
+:ufw-user-limit - [0:0]
+:ufw-user-limit-accept - [0:0]
+### RULES ###
+
+### tuple ### allow udp 51820 0.0.0.0/0 any 0.0.0.0/0 in comment=416c6c6f77205769726547756172642056504e
+-A ufw-user-input -p udp --dport 51820 -j ACCEPT
+
+### tuple ### allow tcp 22 0.0.0.0/0 any 0.0.0.0/0 in comment=416c6c6f772053534820616363657373
+-A ufw-user-input -p tcp --dport 22 -j ACCEPT
+
+### tuple ### allow tcp 80 0.0.0.0/0 any 0.0.0.0/0 in comment=416c6c6f7720485454502028436164647929
+-A ufw-user-input -p tcp --dport 80 -j ACCEPT
+
+### tuple ### allow tcp 443 0.0.0.0/0 any 0.0.0.0/0 in comment=416c6c6f772048545450532028436164647929
+-A ufw-user-input -p tcp --dport 443 -j ACCEPT
+
+### tuple ### allow tcp 3000 0.0.0.0/0 any 0.0.0.0/0 in comment=466f7267656a6f
+-A ufw-user-input -p tcp --dport 3000 -j ACCEPT
+
+### tuple ### allow tcp 51819 0.0.0.0/0 any 0.0.0.0/0 in
+-A ufw-user-input -p tcp --dport 51819 -j ACCEPT
+
+### tuple ### allow tcp 3022 0.0.0.0/0 any 0.0.0.0/0 in
+-A ufw-user-input -p tcp --dport 3022 -j ACCEPT
+
+### END RULES ###
+
+### LOGGING ###
+-A ufw-after-logging-input -j LOG --log-prefix "[UFW BLOCK] " -m limit --limit 3/min --limit-burst 10
+-I ufw-logging-deny -m conntrack --ctstate INVALID -j RETURN -m limit --limit 3/min --limit-burst 10
+-A ufw-logging-deny -j LOG --log-prefix "[UFW BLOCK] " -m limit --limit 3/min --limit-burst 10
+-A ufw-logging-allow -j LOG --log-prefix "[UFW ALLOW] " -m limit --limit 3/min --limit-burst 10
+### END LOGGING ###
+
+### RATE LIMITING ###
+-A ufw-user-limit -m limit --limit 3/minute -j LOG --log-prefix "[UFW LIMIT BLOCK] "
+-A ufw-user-limit -j REJECT
+-A ufw-user-limit-accept -j ACCEPT
+### END RATE LIMITING ###
+COMMIT
