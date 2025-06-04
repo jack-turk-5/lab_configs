@@ -6,24 +6,17 @@ After=forgejo.socket
 [Container]
 ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
-AddCapability=CAP_SYS_RESOURCE
-PodmanArgs=--replace --sdnotify=conmon --log-level=debug
 Network=none
 Notify=true
-UserNS=keep-id
-Volume=forgejo-config:/var/lib/gitea/custom:Z,U
-Volume=forgejo-repo-config:/var/lib/gitea:Z,U
+User=podman
+Volume=/mnt/repositories/data:/var/lib/gitea
+Volume=/mnt/repositories/conf:/etc/gitea
 Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
 
 Environment=ENABLE_PUSH_CREATE_USER=true
 Environment=DISABLE_SSH=false
 Environment=START_SSH_SERVER=true
-Environment=USER_UID=1000
-Environment=USER_GID=1000
-Environment=GITEA__server__ENABLE_BASIC_AUTH="true"
-Environment=GITEA__security__REVERSE_PROXY_TRUSTED_PROXIES="0.0.0.0/0,::/0"
-Environment=GITEA__security__REVERSE_PROXY_LIMIT="1"
 Environment=SSH_PORT=3022
 Environment=SSH_DOMAIN=forge.jackturk.dev
 Environment=ROOT_URL=https://forge.jackturk.dev
