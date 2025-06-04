@@ -8,8 +8,8 @@ ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
 Network=none
 User=1001:100
-Volume=%h/containers/forgejo/data:/var/lib/gitea
-Volume=%h/containers/forgejo/conf:/etc/gitea
+Volume=%h/.config/containers/forgejo/data:/var/lib/gitea
+Volume=%h/.config/containers/forgejo/conf:/etc/gitea
 Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
 
