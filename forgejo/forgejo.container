@@ -13,6 +13,8 @@ Volume=%h/.config/containers/systemd/forgejo/conf:/etc/gitea
 Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
 
+Environment=USER_UID=1001
+Environment=USER_GID=100
 Environment=ENABLE_PUSH_CREATE_USER=true
 Environment=DISABLE_SSH=false
 Environment=START_SSH_SERVER=true
