@@ -1,17 +1,17 @@
 {
-	# socket‑activation: fd3=80/tcp, fd4=443/tcp, fd5=443/udp, fd6=admin
+	# socket‑activation: fd3=80/tcp, fd4=443/tcp, fd5=admin
 	debug
-	admin fd/6
+	admin fd/5
 }
 
-http://vpn.jackturk.dev {
+http://vpn.jackturk.dev forge.jackturk.dev  {
 	bind fd/3 {
 		protocols h1
 	}
 	redir https://{host}{uri} permanent
 }
 
-https://vpn.jackturk.dev {
+https://vpn.jackturk.dev forge.jackturk.dev {
 	bind fd/4 {
 		protocols h1 h2
 	}
@@ -45,4 +45,9 @@ https://vpn.jackturk.dev {
 			header_up X-Real-IP {remote}
 		}
 	}
+	@forge host forge.jackturk.dev
+	handle @forge {
+		reverse_proxy host.containers.internal:3000
+	}
+	
 }

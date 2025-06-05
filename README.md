@@ -4,5 +4,4 @@ An opinionated set of instructions, containerfiles, and scripts that I use to se
 ```
 
 # Future Services
-- [Remote desktop access with RustDesk](https://rustdesk.com/)
 - [VaultWarden Password Manager](https://github.com/dani-garcia/vaultwarden)

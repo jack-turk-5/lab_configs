@@ -1,0 +1,5 @@
+[Unit]
+Description=Forgejo's /var/lib/gitea volume
+
+[Volume]
+User=0

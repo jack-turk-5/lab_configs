@@ -6,17 +6,18 @@ After=forgejo.socket
 [Container]
 ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
-Network=slirp4netns:allow_host_loopback=true,port_handler=slirp4netns,enable_ipv6=true
-PublishPort=3022:3022
-User=1001:100
-Volume=%h/.config/containers/systemd/forgejo/data:/var/lib/gitea
-Volume=%h/.config/containers/systemd/forgejo/conf:/etc/gitea
+Network=none
+AutoUpdate=registry
+UserNS=keep-id:uid=1002,gid=1002
+Volume=forgejo-conf.volume:/var/lib/gitea:Z
+Volume=forgejo-data.volume:/data:Z
 Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
 
 Environment=ENABLE_PUSH_CREATE_USER=true
 Environment=DISABLE_SSH=false
 Environment=START_SSH_SERVER=true
+Environment=SSH_CREATE_AUTHORIZED_KEYS_FILE=false
 Environment=SSH_PORT=3022
 Environment=SSH_DOMAIN=forge.jackturk.dev
 Environment=ROOT_URL=https://forge.jackturk.dev
