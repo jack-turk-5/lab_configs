@@ -2,7 +2,6 @@
 Description=Caddy Socket Activation
 
 [Socket]
-BindIPv6Only=both
 ListenStream=80
 ListenStream=443
 ListenDatagram=443
