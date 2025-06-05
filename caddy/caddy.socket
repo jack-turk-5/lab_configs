@@ -2,9 +2,10 @@
 Description=Caddy Socket Activation
 
 [Socket]
-ListenStream=0.0.0.0:80
-ListenStream=0.0.0.0:443
-ListenDatagram=0.0.0.0:443
+ListenStream=[::]:80
+ListenStream=[::]:443
+ListenDatagram=[::]:443
+BindIPv6Only=both
 ListenStream=%t/caddy.sock
 SocketMode=0600
 ReusePort=true
