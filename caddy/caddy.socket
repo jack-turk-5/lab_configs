@@ -8,7 +8,7 @@ ListenStream=[::]:443
 ListenDatagram=[::]:443
 ListenStream=%t/caddy.sock
 SocketMode=0600
-ReusePort=yes
+ReusePort=true
 
 [Install]
 WantedBy=sockets.target
