@@ -9,7 +9,7 @@ Image=codeberg.org/forgejo/forgejo:11-rootless
 Network=none
 AutoUpdate=registry
 UserNS=keep-id:uid=1002,gid=1002
-Volume=forgejo-conf.volume:/var/lib/gitea:Z
+Volume=forgejo-conf.volume:/var/lib/gitea:Z,uid=1002,gid=1002
 Volume=forgejo-data.volume:/data:Z
 Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
