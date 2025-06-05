@@ -6,10 +6,10 @@ After=forgejo.socket
 [Container]
 ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
-Network=forgejo-internal.network
+Network=slirp4netns:mtu=1500,port_handler=slirp4netns,allow_host_loopback=false,enable_ipv6=true
 AutoUpdate=registry
 UserNS=keep-id:uid=1002,gid=1002
-PodmanArgs=--preserve-fds=2
+PodmanArgs=--preserve-fds=1 --publish=3022:3022/udp
 
 Volume=forgejo-conf.volume:/var/lib/gitea:Z,U
 Volume=forgejo-data.volume:/data:Z,U
