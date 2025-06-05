@@ -9,6 +9,8 @@ Image=codeberg.org/forgejo/forgejo:11-rootless
 Network=forgejo-internal.network
 AutoUpdate=registry
 UserNS=keep-id:uid=1002,gid=1002
+PodmanArgs=--preserve-fds=2
+
 Volume=forgejo-conf.volume:/var/lib/gitea:Z,U
 Volume=forgejo-data.volume:/data:Z,U
 Volume=/etc/timezone:/etc/timezone:ro
