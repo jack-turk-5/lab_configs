@@ -18,6 +18,7 @@ Volume=/etc/localtime:/etc/localtime:ro
 
 Environment=ENABLE_PUSH_CREATE_USER=true
 Environment=SSH_CREATE_AUTHORIZED_KEYS_FILE=false
+Environment=PROTOCOL=http
 Environment=SSH_PORT=22
 Environment=SSH_DOMAIN=forge.jackturk.dev
 Environment=ROOT_URL=https://forge.jackturk.dev
