@@ -17,8 +17,6 @@ Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
 
 Environment=ENABLE_PUSH_CREATE_USER=true
-Environment=DISABLE_SSH=false
-Environment=START_SSH_SERVER=false
 Environment=SSH_CREATE_AUTHORIZED_KEYS_FILE=false
 Environment=SSH_PORT=22
 Environment=SSH_DOMAIN=forge.jackturk.dev
