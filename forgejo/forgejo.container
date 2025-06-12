@@ -18,11 +18,19 @@ Volume=/etc/localtime:/etc/localtime:ro
 
 Environment=ENABLE_PUSH_CREATE_USER=true
 Environment=DISABLE_SSH=false
-Environment=START_SSH_SERVER=true
+Environment=START_SSH_SERVER=false
 Environment=SSH_CREATE_AUTHORIZED_KEYS_FILE=false
 Environment=SSH_PORT=22
 Environment=SSH_DOMAIN=forge.jackturk.dev
 Environment=ROOT_URL=https://forge.jackturk.dev
+
+HealthCmd=[[ "$(curl --silent --insecure --output /dev/null --write-out \
+          "%{http_code}" http://127.0.0.1:3000/api/healthz)" == '200' ]]
+HealthInterval=15s
+HealthTimeout=1s
+HealthRetries=3
+HealthOnFailure=kill
+Notify=healthy
 
 [Service]
 Restart=on-failure

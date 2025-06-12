@@ -12,6 +12,5 @@ export XDG_RUNTIME_DIR="/run/user/$(id -u)"
 /usr/bin/podman exec \
   --interactive \
   --env SSH_ORIGINAL_COMMAND="$SSH_ORIGINAL_COMMAND" \
-  forgejo \
-    sh "$@"
+  forgejo sh "$@"
 ```
