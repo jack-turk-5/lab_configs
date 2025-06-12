@@ -16,6 +16,7 @@ Volume=forgejo-data.volume:/data:Z,U
 Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
 
+AddCapability=CAP_NET_BIND_SERVICE
 Environment=ENABLE_PUSH_CREATE_USER=true
 Environment=SSH_CREATE_AUTHORIZED_KEYS_FILE=false
 Environment=PROTOCOL=http
