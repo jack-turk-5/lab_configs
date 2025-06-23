@@ -12,7 +12,9 @@ http://vpn.jackturk.dev forge.jackturk.dev vault.jackturk.dev {
 }
 
 https://vpn.jackturk.dev forge.jackturk.dev vault.jackturk.dev {
-	bind fd/4
+	bind fd/4 {
+		protocols h1 h2 acme
+	}
 	encode gzip
 
 	# 1) Preflight matcher
