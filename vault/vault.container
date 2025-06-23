@@ -9,6 +9,7 @@ Image=ghcr.io/dani-garcia/vaultwarden:latest
 Network=none
 Exec=/start.sh
 Volume=vault-data:/data/
+Environment=DOMAIN=https://vault.jackturk.dev
 Environment=ROCKET_PORT=8080
 
 [Install]
