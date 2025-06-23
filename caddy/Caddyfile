@@ -15,11 +15,6 @@ https://vpn.jackturk.dev https://forge.jackturk.dev https://vault.jackturk.dev {
 	bind fd/4 {
 		protocols h1 h2
 	}
-	tls {
-		issuer acme {
-			disable_tlsalpn_challenge
-		}
-	}
 	encode gzip
 
 	# 1) Preflight matcher
@@ -43,16 +38,16 @@ https://vpn.jackturk.dev https://forge.jackturk.dev https://vault.jackturk.dev {
 		}
 	}
 
+	@forge host forge.jackturk.dev
+	handle @forge {
+		reverse_proxy host.containers.internal:3000
+	}
+
 	@vault host vault.jackturk.dev
 	handle @vault {
 		reverse_proxy /* host.containers.internal:8080 {
 			header_up Host {host}
 			header_up X-Real-IP {remote}
 		}
-	}
-
-	@forge host forge.jackturk.dev
-	handle @forge {
-		reverse_proxy host.containers.internal:3000
 	}
 }
