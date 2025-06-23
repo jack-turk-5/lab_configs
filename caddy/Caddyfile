@@ -13,7 +13,12 @@ http://vpn.jackturk.dev forge.jackturk.dev vault.jackturk.dev {
 
 https://vpn.jackturk.dev forge.jackturk.dev vault.jackturk.dev {
 	bind fd/4 {
-		protocols h1 h2 acme
+		protocols h1 h2
+	}
+	tls {
+		issuer acme {
+			disable_tlsalpn_challenge
+		}
 	}
 	encode gzip
 
@@ -40,7 +45,7 @@ https://vpn.jackturk.dev forge.jackturk.dev vault.jackturk.dev {
 
 	@vault host vault.jackturk.dev
 	handle @vault {
-		reverse_proxy :8080 {
+		reverse_proxy /* host.containers.internal:8080 {
 			header_up Host {host}
 			header_up X-Real-IP {remote}
 		}
