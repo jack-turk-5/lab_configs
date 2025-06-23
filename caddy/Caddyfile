@@ -40,7 +40,7 @@ https://vpn.jackturk.dev forge.jackturk.dev vault.jackturk.dev {
 
 	@vault host vault.jackturk.dev
 	handle @vault {
-		reverse_proxy host.containers.internal:8080 {
+		reverse_proxy /* host.containers.internal:8080 {
 			header_up Host {host}
 			header_up X-Real-IP {remote}
 		}
