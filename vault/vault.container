@@ -1,7 +1,7 @@
 [Unit]
 Description=Vaultwarden Container
-Requires=vault.socket
-After=vault.socket
+Requires=network-online.target
+After=network-online.target
 
 [Container]
 AutoUpdate=registry
