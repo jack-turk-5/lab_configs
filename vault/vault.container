@@ -8,9 +8,8 @@ Image=ghcr.io/dani-garcia/vaultwarden:latest
 PublishPort=8080:8080
 Exec=/start.sh
 Volume=vault-data:/data/
-Environment=LOG_LEVEL=debug
-Environment=DOMAIN=https://vault.jackturk.dev
 Environment=ROCKET_PORT=8080
+EnvironmentFile=%h/.config/vault/env
 
 [Install]
 WantedBy=default.target
