@@ -1,8 +1,10 @@
 [Unit]
+
 Description=Vaultwarden Container
 After=network-online.target
 
 [Container]
+ContainerName=vaultwarden
 AutoUpdate=registry
 Image=ghcr.io/dani-garcia/vaultwarden:latest
 PublishPort=8080:8080
