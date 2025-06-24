@@ -10,6 +10,7 @@ Image=ghcr.io/dani-garcia/vaultwarden:latest
 PublishPort=8080:8080
 Exec=/start.sh
 Volume=vault-data:/data/
+Secret=vw-admin-token,type=env,target=ADMIN_TOKEN
 Environment=ROCKET_PORT=8080
 EnvironmentFile=%h/.config/vault/env
 
