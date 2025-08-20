@@ -6,7 +6,7 @@ After=portfolio.socket
 [Container]
 Image=ghcr.io/jack-turk-5/portfolio-app:latest
 ContainerName=portfolio
-Network=none
+Network=portfolio-internal.network
 PodmanArgs=--preserve-fds=1
 Notify=true
 Exec=caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
