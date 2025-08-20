@@ -2,8 +2,8 @@
 Description=Forgejo Socket (Rootless)
 
 [Socket]
-ListenStream=[::]:2222
 ListenStream=[::]:3000
+ListenStream=[::]:3022
 BindIPv6Only=both
 NoDelay=true
 
