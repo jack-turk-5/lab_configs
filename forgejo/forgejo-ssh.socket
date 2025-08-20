@@ -1,0 +1,10 @@
+[Unit]
+Description=Forgejo SSH Socket (Rootless)
+
+[Socket]
+ListenStream=[::]:2222
+BindIPv6Only=both
+NoDelay=true
+
+[Install]
+WantedBy=sockets.target
