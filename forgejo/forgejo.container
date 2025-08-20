@@ -6,7 +6,6 @@ After=forgejo.socket forgejo-ssh.socket
 [Container]
 ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
-Network=forgejo-internal.network
 AutoUpdate=registry
 UserNS=keep-id:uid=1002,gid=1002
 PodmanArgs=--preserve-fds=2
@@ -20,7 +19,7 @@ AddCapability=CAP_NET_BIND_SERVICE
 Environment=ENABLE_PUSH_CREATE_USER=true
 Environment=SSH_CREATE_AUTHORIZED_KEYS_FILE=false
 Environment=PROTOCOL=http
-Environment=SSH_PORT=22
+Environment=SSH_PORT=2222
 Environment=SSH_DOMAIN=forge.jackturk.dev
 Environment=ROOT_URL=https://forge.jackturk.dev
 
