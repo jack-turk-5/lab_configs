@@ -30,6 +30,14 @@ https://vpn.jackturk.dev https://forge.jackturk.dev https://vault.jackturk.dev h
 	# 3) Now respond 204 every time
 	respond @preflight 204
 
+	@portfolio host jackturk.dev
+	handle @portfolio {
+		reverse_proxy /* host.containers.internal:8081 {
+			header_up Host {host}
+			header_up X-Real-IP {remote}
+		}
+	}
+
 	@vpn host vpn.jackturk.dev
 	handle @vpn {
 		reverse_proxy /* host.containers.internal:51819 {
@@ -46,14 +54,6 @@ https://vpn.jackturk.dev https://forge.jackturk.dev https://vault.jackturk.dev h
 	@vault host vault.jackturk.dev
 	handle @vault {
 		reverse_proxy /* host.containers.internal:8080 {
-			header_up Host {host}
-			header_up X-Real-IP {remote}
-		}
-	}
-
-	@portfolio host jackturk.dev
-	handle @portfolio {
-		reverse_proxy /* host.containers.internal:8081 {
 			header_up Host {host}
 			header_up X-Real-IP {remote}
 		}
