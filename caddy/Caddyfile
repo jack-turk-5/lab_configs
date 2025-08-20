@@ -53,6 +53,9 @@ https://vpn.jackturk.dev https://forge.jackturk.dev https://vault.jackturk.dev h
 
 	@portfolio host jackturk.dev
 	handle @portfolio {
-		reverse_proxy host.containers.internal:8081
+		reverse_proxy /* host.containers.internal:8081 {
+			header_up Host {host}
+			header_up X-Real-IP {remote}
+		}
 	}
 }
