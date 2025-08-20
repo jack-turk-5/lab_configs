@@ -1,0 +1,13 @@
+[Unit]
+Description=Portfolio Container
+Requires=portfolio.socket
+After=portfolio.socket
+
+[Container]
+Image=ghcr.io/jack-turk-5/portfolio-app:latest
+ContainerName=portfolio
+Network=none
+PodmanArgs=--preserve-fds=1
+
+[Install]
+WantedBy=default.target

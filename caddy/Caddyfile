@@ -4,14 +4,14 @@
 	admin fd/6
 }
 
-http://vpn.jackturk.dev http://forge.jackturk.dev http://vault.jackturk.dev {
+http://vpn.jackturk.dev http://forge.jackturk.dev http://vault.jackturk.dev http://jackturk.dev {
 	bind fd/3 {
 		protocols h1
 	}
 	redir https://{host}{uri} permanent
 }
 
-https://vpn.jackturk.dev https://forge.jackturk.dev https://vault.jackturk.dev {
+https://vpn.jackturk.dev https://forge.jackturk.dev https://vault.jackturk.dev https://jackturk.dev {
 	bind fd/4 {
 		protocols h1 h2
 	}
@@ -49,5 +49,10 @@ https://vpn.jackturk.dev https://forge.jackturk.dev https://vault.jackturk.dev {
 			header_up Host {host}
 			header_up X-Real-IP {remote}
 		}
+	}
+
+	@portfolio host jackturk.dev
+	handle @portfolio {
+		reverse_proxy host.containers.internal:8081
 	}
 }
