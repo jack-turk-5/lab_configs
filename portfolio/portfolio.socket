@@ -4,6 +4,8 @@ Description=Portfolio Socket (Rootless)
 [Socket]
 ListenStream=[::]:8081
 BindIPv6Only=both
+SocketMode=0600
+Service=portfolio.service
 
 [Install]
 WantedBy=sockets.target
