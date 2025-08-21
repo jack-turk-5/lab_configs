@@ -1,0 +1,11 @@
+[Unit]
+Description=Socket Activation for WireGuard Pro
+
+[Socket]
+ListenStream=[::]:51819
+BindIPv6Only=both
+SocketMode=0600
+Service=wireguard-pro.service
+
+[Install]
+WantedBy=sockets.target
