@@ -5,40 +5,33 @@
     state: directory
     mode: '0755'
   loop:
-    - "~/.config/vaultwarden"
+    - "~/.config/vault"
 
 - name: Create Vaultwarden data directory with strict permissions
   ansible.builtin.file:
-    path: "~/.config/vaultwarden/data"
+    path: "~/.config/vault/data"
     state: directory
     mode: '0700'
 
 - name: Copy Vaultwarden environment file
   ansible.builtin.copy:
     src: vault.env
-    dest: "~/.config/vaultwarden/environment"
-    mode: '0600' # Environment file can contain secrets
+    dest: "~/.config/vault/env"
+    mode: '0600'
 
 - name: Copy Vaultwarden systemd unit to user quadlet directory
   ansible.builtin.copy:
     src: vault.container
     dest: "~/.config/containers/systemd/"
-  notify: Reload systemd and restart vault
+
+- name: Reload systemd user daemon to detect new units
+  ansible.builtin.systemd:
+    scope: user
+    daemon_reload: yes
 
 - name: Ensure Vaultwarden service is started and enabled
   ansible.builtin.systemd:
     scope: user
-    name: vault.container
+    name: vault
     enabled: yes
     state: started
-
-- name: Flush handlers
-  ansible.builtin.meta: flush_handlers
-
-- name: Define systemd reload and vault restart handler
-  ansible.builtin.systemd:
-    scope: user
-    daemon_reload: yes
-    name: vault.container
-    state: restarted
-  listen: Reload systemd and restart vault

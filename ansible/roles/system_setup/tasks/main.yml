@@ -1,0 +1,24 @@
+---
+- name: Install base system packages
+  ansible.builtin.package:
+    name:
+      - zsh
+      - podman
+      - ufw
+      - git
+      - acl # Required for become_user to unprivileged users
+    state: present
+
+- name: Set root user shell to zsh
+  ansible.builtin.user:
+    name: root
+    shell: /bin/zsh
+
+- name: Enable linger for service users
+  ansible.builtin.command:
+    cmd: "loginctl enable-linger {{ item }}"
+  args:
+    creates: "/var/lib/systemd/linger/{{ item }}"
+  loop:
+    - "{{ podman_user }}"
+    - "{{ forgejo_user }}"

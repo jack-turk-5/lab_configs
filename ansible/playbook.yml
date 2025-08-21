@@ -1,13 +1,36 @@
 ---
-- name: Configure lab server
+# Play 1: System Configuration (run as root)
+- name: Configure base system and root user
   hosts: servers
   become: yes
+  vars:
+    podman_user: podman
+    forgejo_user: git
+  roles:
+    - role: system_setup
+    - role: ufw
+
+# Play 2: Podman User Configuration (run as podman)
+- name: Configure podman user and services
+  hosts: servers
+  become: yes
+  become_user: "{{ podman_user }}"
+  vars:
+    podman_user: podman
   roles:
     - role: zsh
     - role: podman
-    - role: ufw
     - role: caddy
     - role: portfolio
     - role: wireguard-pro
     - role: vault
+
+# Play 3: Forgejo User Configuration (run as git)
+- name: Configure forgejo user and service
+  hosts: servers
+  become: yes
+  become_user: "{{ forgejo_user }}"
+  vars:
+    forgejo_user: git
+  roles:
     - role: forgejo
