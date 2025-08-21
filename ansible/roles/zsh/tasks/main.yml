@@ -1,0 +1,79 @@
+---
+- name: Install zsh and git packages
+  ansible.builtin.package:
+    name:
+      - zsh
+      - git
+    state: present
+
+- name: Configure zsh for user accounts
+  vars:
+    users:
+      - name: root
+        home: /root
+      - name: "{{ nonroot_user | default('podman') }}"
+        home: "/home/{{ nonroot_user | default('podman') }}"
+  loop: "{{ users }}"
+  loop_control:
+    loop_var: user_item
+  block:
+    - name: "Set zsh as the shell for {{ user_item.name }}"
+      ansible.builtin.user:
+        name: "{{ user_item.name }}"
+        shell: /bin/zsh
+
+    - name: "Check if Oh My Zsh is installed for {{ user_item.name }}"
+      ansible.builtin.stat:
+        path: "{{ user_item.home }}/.oh-my-zsh"
+      register: oh_my_zsh_stat
+
+    - name: "Install Oh My Zsh for {{ user_item.name }}"
+      ansible.builtin.shell:
+        cmd: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+      args:
+        creates: "{{ user_item.home }}/.oh-my-zsh"
+      become: yes
+      become_user: "{{ user_item.name }}"
+      when: not oh_my_zsh_stat.stat.exists
+
+    - name: "Clone zsh-autosuggestions plugin for {{ user_item.name }}"
+      ansible.builtin.git:
+        repo: 'https://github.com/zsh-users/zsh-autosuggestions.git'
+        dest: "{{ user_item.home }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+        depth: 1
+      become: yes
+      become_user: "{{ user_item.name }}"
+
+    - name: "Clone zsh-syntax-highlighting plugin for {{ user_item.name }}"
+      ansible.builtin.git:
+        repo: 'https://github.com/zsh-users/zsh-syntax-highlighting.git'
+        dest: "{{ user_item.home }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+        depth: 1
+      become: yes
+      become_user: "{{ user_item.name }}"
+
+    - name: "Update plugins in .zshrc for {{ user_item.name }}"
+      ansible.builtin.lineinfile:
+        path: "{{ user_item.home }}/.zshrc"
+        regexp: '^plugins=\(.*?\)$'
+        line: 'plugins=(git zsh-syntax-highlighting zsh-autosuggestions)'
+        owner: "{{ user_item.name }}"
+        group: "{{ user_item.name }}" # Assumes group name is same as user name
+        mode: '0644'
+
+    - name: "Create custom zsh config for Podman environment variables for {{ user_item.name }}"
+      ansible.builtin.blockinfile:
+        path: "{{ user_item.home }}/.oh-my-zsh/custom/podman.zsh"
+        create: yes
+        owner: "{{ user_item.name }}"
+        group: "{{ user_item.name }}" # Assumes group name is same as user name
+        mode: '0644'
+        block: |
+          export XDG_RUNTIME_DIR=/run/user/$(id -u)
+          export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
+
+    - name: "Enable linger for {{ user_item.name }}"
+      ansible.builtin.command:
+        cmd: "loginctl enable-linger {{ user_item.name }}"
+      args:
+        creates: "/var/lib/systemd/linger/{{ user_item.name }}"

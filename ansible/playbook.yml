@@ -1,0 +1,13 @@
+---
+- name: Configure lab server
+  hosts: servers
+  become: yes
+  roles:
+    - role: zsh
+    - role: podman
+    - role: ufw
+    - role: caddy
+    - role: portfolio
+    - role: wireguard-pro
+    - role: vault
+    - role: forgejo

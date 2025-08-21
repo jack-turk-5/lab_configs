@@ -1,0 +1,37 @@
+---
+- name: Create WireGuard Pro config directory in user space
+  ansible.builtin.file:
+    path: "~/.config/wireguard-pro"
+    state: directory
+    mode: '0755'
+
+- name: Copy WireGuard Pro socket unit to user systemd directory
+  ansible.builtin.copy:
+    src: "wireguard-pro.socket"
+    dest: "~/.config/systemd/user/"
+
+- name: Copy WireGuard Pro container unit to user quadlet directory
+  ansible.builtin.copy:
+    src: "wireguard-pro.container"
+    dest: "~/.config/containers/systemd/"
+
+- name: Copy WireGuard Pro support scripts
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "~/.config/wireguard-pro/"
+    mode: '0755' # Make script executable
+  loop:
+    - create_credentials.py
+    - Makefile
+
+- name: Reload systemd user daemon to detect new units
+  ansible.builtin.systemd:
+    scope: user
+    daemon_reload: yes
+
+- name: Enable and start WireGuard Pro socket for user
+  ansible.builtin.systemd:
+    scope: user
+    name: wireguard-pro.socket
+    enabled: yes
+    state: started
