@@ -6,17 +6,8 @@
 
 #### User Tasks
 - Socket goes under `~/.config/systemd/user/`
-- Containerfile goes under `~/.config/containers/systemd/`
+- Container quadlet goes under `~/.config/containers/systemd/`
 - Make sure lingering is enabled (see `../podman/setup.md`)
 - Reload systemd user daemon `systemctl --user daemon-reload`
 - Manually enable the sockets `systemctl --user enable --now caddy.socket`
 - Manually start container `systemctl --user start caddy`
-
-#### Caddyfile Info
-```
-vpn.jackturk.dev {
-    # With current slirp setup, local services will be available at host.containers.internal:<port>/endpoint
-    reverse_proxy http://host.containers.internal:51821
-    encode gzip
-}
-```
