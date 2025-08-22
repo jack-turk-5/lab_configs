@@ -20,10 +20,10 @@
   roles:
     - role: zsh
     - role: podman
-    - role: caddy
     - role: portfolio
     - role: wireguard-pro
     - role: vault
+    - role: caddy
 
 # Play 3: Forgejo User Configuration (run as git)
 - name: Configure forgejo user and service

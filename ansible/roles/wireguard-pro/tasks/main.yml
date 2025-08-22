@@ -22,13 +22,12 @@
     state: directory
     mode: '0755'
 
-- name: Copy WireGuard Pro support scripts
+- name: Copy WireGuard Pro support file
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "~/.config/wireguard-pro/"
-    mode: '0755' # Make script executable
+    mode: '0755'
   loop:
-    - create_credentials.py
     - Makefile
 
 - name: Run WireGuard Pro setup prerequisites (keys and podman pull)
