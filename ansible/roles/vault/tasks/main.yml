@@ -1,4 +1,24 @@
 ---
+- name: Include encrypted variables
+  ansible.builtin.include_vars:
+    file: ../../secrets.yml
+    name: vaulted_secrets
+
+- name: Check if vaultwarden admin token secret exists
+  ansible.builtin.command:
+    cmd: podman secret exists vw-admin-token
+  register: admin_token_secret_check
+  failed_when: false
+  changed_when: false
+
+- name: Create vaultwarden admin token secret from vault if it does not exist
+  containers.podman.podman_secret:
+    name: vw-admin-token
+    data: "{{ vaulted_secrets.vw_admin_token }}"
+    state: present
+  when: admin_token_secret_check.rc != 0
+  register: admin_token_secret_created
+
 - name: Create Vaultwarden config directory structure
   ansible.builtin.file:
     path: "{{ item }}"
