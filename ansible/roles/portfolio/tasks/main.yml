@@ -1,20 +1,33 @@
 ---
+- name: Ensure latest Portfolio container image is pulled
+  containers.podman.podman_image:
+    name: ghcr.io/jack-turk-5/portfolio-app:latest
+  register: image_pulled
+
 - name: Copy Portfolio socket unit to user systemd directory
   ansible.builtin.copy:
     src: "portfolio.socket"
     dest: "~/.config/systemd/user/"
+  register: socket_copied
 
 - name: Copy Portfolio container unit to user quadlet directory
   ansible.builtin.copy:
     src: "portfolio.container"
     dest: "~/.config/containers/systemd/"
+  register: container_copied
 
-- name: Reload systemd user daemon to detect new units
+- name: Reload systemd and restart socket if configuration changed
   ansible.builtin.systemd:
     scope: user
     daemon_reload: yes
+    name: portfolio.socket
+    state: restarted
+  when: >
+    image_pulled.changed or
+    socket_copied.changed or
+    container_copied.changed
 
-- name: Enable and start Portfolio socket for user
+- name: Ensure Portfolio socket is enabled and started
   ansible.builtin.systemd:
     scope: user
     name: portfolio.socket
