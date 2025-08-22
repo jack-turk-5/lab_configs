@@ -1,0 +1,36 @@
+---
+- name: Create Caddy config directory in user space
+  ansible.builtin.file:
+    path: "~/.config/caddy"
+    state: directory
+    mode: '0755'
+
+- name: Copy Caddyfile to user config
+  ansible.builtin.copy:
+    src: Caddyfile
+    dest: "~/.config/caddy/Caddyfile"
+
+- name: Copy Caddy socket unit to user systemd directory
+  ansible.builtin.copy:
+    src: "caddy.socket"
+    dest: "~/.config/systemd/user/"
+
+- name: Copy Caddy container and network units to user quadlet directory
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "~/.config/containers/systemd/"
+  loop:
+    - caddy.container
+    - caddy-internal.network
+
+- name: Reload systemd user daemon to detect new units
+  ansible.builtin.systemd:
+    scope: user
+    daemon_reload: yes
+
+- name: Enable and start Caddy socket for user
+  ansible.builtin.systemd:
+    scope: user
+    name: caddy.socket
+    enabled: yes
+    state: started

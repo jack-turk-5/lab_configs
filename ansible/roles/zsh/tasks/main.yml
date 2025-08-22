@@ -1,0 +1,44 @@
+---
+- name: Set shell for current user to zsh
+  ansible.builtin.user:
+    name: "{{ ansible_user_id }}"
+    shell: /bin/zsh
+  become: yes # This task needs to become root to modify /etc/passwd
+
+- name: Check if Oh My Zsh is installed
+  ansible.builtin.stat:
+    path: "{{ ansible_user_dir }}/.oh-my-zsh"
+  register: oh_my_zsh_stat
+
+- name: Install Oh My Zsh
+  ansible.builtin.shell:
+    cmd: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  args:
+    creates: "{{ ansible_user_dir }}/.oh-my-zsh"
+  when: not oh_my_zsh_stat.stat.exists
+
+- name: Clone zsh-autosuggestions plugin
+  ansible.builtin.git:
+    repo: 'https://github.com/zsh-users/zsh-autosuggestions.git'
+    dest: "{{ ansible_user_dir }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+    depth: 1
+
+- name: Clone zsh-syntax-highlighting plugin
+  ansible.builtin.git:
+    repo: 'https://github.com/zsh-users/zsh-syntax-highlighting.git'
+    dest: "{{ ansible_user_dir }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+    depth: 1
+
+- name: Update plugins in .zshrc
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_user_dir }}/.zshrc"
+    regexp: '^plugins=\(.*?\)$'
+    line: 'plugins=(git zsh-syntax-highlighting zsh-autosuggestions)'
+
+- name: Create custom zsh config for Podman environment variables
+  ansible.builtin.blockinfile:
+    path: "{{ ansible_user_dir }}/.oh-my-zsh/custom/podman.zsh"
+    create: yes
+    block: |
+      export XDG_RUNTIME_DIR=/run/user/$(id -u)
+      export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
