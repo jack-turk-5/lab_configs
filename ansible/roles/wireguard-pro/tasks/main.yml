@@ -4,55 +4,100 @@
     file: ../../secrets.yml
     name: vaulted_secrets
 
-- name: Create WireGuard admin-user secret from vault
+- name: Check if WireGuard admin-user secret exists
+  ansible.builtin.command:
+    cmd: podman secret exists admin-user
+  register: admin_user_secret_check
+  failed_when: false
+  changed_when: false
+
+- name: Create WireGuard admin-user secret from vault if it does not exist
   containers.podman.podman_secret:
     name: admin-user
     data: "{{ vaulted_secrets.wg_admin_user }}"
     state: present
+  when: admin_user_secret_check.rc != 0
+  register: user_secret_created
 
-- name: Create WireGuard admin-pass secret from vault
+- name: Check if WireGuard admin-pass secret exists
+  ansible.builtin.command:
+    cmd: podman secret exists admin-pass
+  register: admin_pass_secret_check
+  failed_when: false
+  changed_when: false
+
+- name: Create WireGuard admin-pass secret from vault if it does not exist
   containers.podman.podman_secret:
     name: admin-pass
     data: "{{ vaulted_secrets.wg_admin_pass }}"
     state: present
+  when: admin_pass_secret_check.rc != 0
+  register: pass_secret_created
 
-- name: Create WireGuard Pro config directory in user space
-  ansible.builtin.file:
-    path: "~/.config/wireguard-pro"
-    state: directory
-    mode: '0755'
-
-- name: Copy WireGuard Pro support file
-  ansible.builtin.copy:
-    src: "{{ item }}"
-    dest: "~/.config/wireguard-pro/"
-    mode: '0755'
-  loop:
-    - Makefile
-
-- name: Run WireGuard Pro setup prerequisites (keys and podman pull)
+- name: Check if WireGuard private key secret exists
   ansible.builtin.command:
-    cmd: make setup
-    chdir: "~/.config/wireguard-pro/"
-  register: setup_output
-  changed_when: "'created' in setup_output.stdout or 'pulling' in setup_output.stdout | lower"
+    cmd: podman secret exists wg-privatekey
+  register: wg_privatekey_check
+  failed_when: false
+  changed_when: false
+
+- name: Generate and store WireGuard keys if they do not exist
+  when: wg_privatekey_check.rc != 0
+  block:
+    - name: Generate private key
+      ansible.builtin.command:
+        cmd: wg genkey
+      register: wg_privatekey_gen
+
+    - name: Store private key in podman secret
+      containers.podman.podman_secret:
+        name: wg-privatekey
+        data: "{{ wg_privatekey_gen.stdout }}"
+
+    - name: Generate public key from private key
+      ansible.builtin.command:
+        cmd: wg pubkey
+        stdin: "{{ wg_privatekey_gen.stdout }}"
+      register: wg_publickey_gen
+
+    - name: Store public key in podman secret
+      containers.podman.podman_secret:
+        name: wg-publickey
+        data: "{{ wg_publickey_gen.stdout }}"
+  register: keys_created
+
+- name: Ensure WireGuard Pro container image is pulled
+  containers.podman.podman_image:
+    name: ghcr.io/jack-turk-5/wireguard/wireguard-pro:latest
+  register: image_pulled
 
 - name: Copy WireGuard Pro socket unit to user systemd directory
   ansible.builtin.copy:
     src: "wireguard-pro.socket"
     dest: "~/.config/systemd/user/"
+  register: socket_copied
 
 - name: Copy WireGuard Pro container unit to user quadlet directory
   ansible.builtin.copy:
     src: "wireguard-pro.container"
     dest: "~/.config/containers/systemd/"
+  register: container_copied
 
-- name: Reload systemd user daemon to detect new units
+- name: Reload systemd and restart socket if configuration changed
   ansible.builtin.systemd:
     scope: user
     daemon_reload: yes
+    name: wireguard-pro.socket
+    state: restarted
+  when: >
+    user_secret_created.changed or
+    pass_secret_created.changed or
+    keys_created.changed or
+    image_pulled.changed or
+    socket_copied.changed or
+    container_copied.changed
 
-- name: Enable and start WireGuard Pro socket for user
+- name: Ensure WireGuard Pro socket is enabled and started
   ansible.builtin.systemd:
     scope: user
     name: wireguard-pro.socket
