@@ -6,7 +6,6 @@ After=forgejo.socket
 [Container]
 ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
-AutoUpdate=registry
 UserNS=keep-id:uid=1002,gid=1002
 PodmanArgs=--preserve-fds=2
 
@@ -27,6 +26,3 @@ Environment=ROOT_URL=https://forge.jackturk.dev
 Restart=on-failure
 Type=notify
 NotifyAccess=main
-
-[Install]
-WantedBy=default.target
