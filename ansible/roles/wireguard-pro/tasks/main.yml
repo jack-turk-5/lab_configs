@@ -1,9 +1,43 @@
 ---
+- name: Include encrypted variables
+  ansible.builtin.include_vars:
+    file: ../../secrets.yml
+    name: vaulted_secrets
+
+- name: Create WireGuard admin-user secret from vault
+  containers.podman.podman_secret:
+    name: admin-user
+    data: "{{ vaulted_secrets.wg_admin_user }}"
+    state: present
+
+- name: Create WireGuard admin-pass secret from vault
+  containers.podman.podman_secret:
+    name: admin-pass
+    data: "{{ vaulted_secrets.wg_admin_pass }}"
+    state: present
+    data_is_b64: no
+
 - name: Create WireGuard Pro config directory in user space
   ansible.builtin.file:
     path: "~/.config/wireguard-pro"
     state: directory
     mode: '0755'
+
+- name: Copy WireGuard Pro support scripts
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "~/.config/wireguard-pro/"
+    mode: '0755' # Make script executable
+  loop:
+    - create_credentials.py
+    - Makefile
+
+- name: Run WireGuard Pro setup prerequisites (keys and podman pull)
+  ansible.builtin.command:
+    cmd: make setup
+    chdir: "~/.config/wireguard-pro/"
+  register: setup_output
+  changed_when: "'created' in setup_output.stdout or 'pulling' in setup_output.stdout | lower"
 
 - name: Copy WireGuard Pro socket unit to user systemd directory
   ansible.builtin.copy:
@@ -14,15 +48,6 @@
   ansible.builtin.copy:
     src: "wireguard-pro.container"
     dest: "~/.config/containers/systemd/"
-
-- name: Copy WireGuard Pro support scripts
-  ansible.builtin.copy:
-    src: "{{ item }}"
-    dest: "~/.config/wireguard-pro/"
-    mode: '0755' # Make script executable
-  loop:
-    - create_credentials.py
-    - Makefile
 
 - name: Reload systemd user daemon to detect new units
   ansible.builtin.systemd:

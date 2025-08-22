@@ -6,13 +6,16 @@ UI_DATA=wg-pro-data
 PRIV_KEY=wg-privatekey
 PUB_KEY=wg-publickey
 
-.PHONY: git reload start stop wg-keys credentials clean upgrade deploy status logs
+.PHONY: pull reload start stop wg-keys clean upgrade deploy status logs setup
+
+## Setup: Run all prerequisites without starting the service
+setup: wg-keys pull
 
 ## Upgrade container (build + reload)
-upgrade: git reload status
+upgrade: pull reload status
 
 ## Deploy: secrets + build + start
-deploy: wg-keys credentials git start status
+deploy: setup start status
 
 ## Reload the container and socket (zero downtime)
 reload:
@@ -21,7 +24,7 @@ reload:
 	systemctl --user restart $(CONTAINER_NAME).socket $(CONTAINER_NAME).service
 
 # Pull the latest release
-git:
+pull:
 	podman pull $(IMAGE_NAME):$(IMAGE_TAG)
 
 ## Create wg-keys if missing (tempfile fallback)
@@ -40,11 +43,6 @@ wg-keys:
 	  rm -f $$tmp; \
 	  echo "✓ Keys created and stored in Podman secrets, no files left on disk!"; \
 	fi
-
-## Create UI credentials if missing 
-credentials:
-	@echo "→ Creating admin-user/admin-pass secrets"
-	@./create_credentials.py
 
 ## Start container and socket
 start:
