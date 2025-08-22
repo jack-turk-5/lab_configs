@@ -64,7 +64,7 @@
       containers.podman.podman_secret:
         name: wg-publickey
         data: "{{ wg_publickey_gen.stdout }}"
-  register: keys_created
+      register: key_secrets_created
 
 - name: Ensure WireGuard Pro container image is pulled
   containers.podman.podman_image:
@@ -92,7 +92,7 @@
   when: >
     user_secret_created.changed or
     pass_secret_created.changed or
-    keys_created.changed or
+    (key_secrets_created is defined and key_secrets_created.changed) or
     image_pulled.changed or
     socket_copied.changed or
     container_copied.changed
