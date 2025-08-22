@@ -15,7 +15,6 @@
     name: admin-pass
     data: "{{ vaulted_secrets.wg_admin_pass }}"
     state: present
-    data_is_b64: no
 
 - name: Create WireGuard Pro config directory in user space
   ansible.builtin.file:
