@@ -66,11 +66,6 @@
         data: "{{ wg_publickey_gen.stdout }}"
       register: key_secrets_created
 
-- name: Ensure WireGuard Pro container image is pulled
-  containers.podman.podman_image:
-    name: ghcr.io/jack-turk-5/wireguard/wireguard-pro:latest
-  register: image_pulled
-
 - name: Copy WireGuard Pro socket unit to user systemd directory
   ansible.builtin.copy:
     src: "wireguard-pro.socket"
@@ -83,19 +78,30 @@
     dest: "~/.config/containers/systemd/"
   register: container_copied
 
-- name: Reload systemd and restart socket if configuration changed
+- name: Reload systemd if unit files changed
+  ansible.builtin.systemd:
+    scope: user
+    daemon_reload: yes
+  when: >
+    user_secret_created.changed or
+    pass_secret_created.changed or
+    (key_secrets_created is defined and key_secrets_created.changed) or
+    socket_copied.changed or
+    container_copied.changed
+
+- name: Pull latest wireguard-pro image
+  containers.podman.podman_image:
+    name: ghcr.io/jack-turk-5/wireguard/wireguard-pro:latest
+    pull: true
+  register: pull_result
+
+- name: Reload systemd and restart socket if container was updated
   ansible.builtin.systemd:
     scope: user
     daemon_reload: yes
     name: wireguard-pro.socket
     state: restarted
-  when: >
-    user_secret_created.changed or
-    pass_secret_created.changed or
-    (key_secrets_created is defined and key_secrets_created.changed) or
-    image_pulled.changed or
-    socket_copied.changed or
-    container_copied.changed
+  when: pull_result.changed
 
 - name: Ensure WireGuard Pro socket is enabled and started
   ansible.builtin.systemd:

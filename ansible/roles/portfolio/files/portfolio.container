@@ -6,12 +6,13 @@ After=portfolio.socket
 [Container]
 Image=ghcr.io/jack-turk-5/portfolio-app:latest
 ContainerName=portfolio
-Network=none
+AutoUpdate=registry
 PodmanArgs=--preserve-fds=1
+Secret=sendgrid-api-key
+Secret=sender-email
+Secret=destination-email
+Environment="CORS_ORIGINS=https://jackturk.dev,https://www.jackturk.dev"
 Notify=true
 
 [Service]
 Restart=always
-
-[Install]
-WantedBy=default.target

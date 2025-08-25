@@ -1,8 +1,26 @@
 ---
-- name: Ensure latest Portfolio container image is pulled
-  containers.podman.podman_image:
-    name: ghcr.io/jack-turk-5/portfolio-app:latest
-  register: image_pulled
+- name: Include encrypted variables
+  ansible.builtin.include_vars:
+    file: ../../secrets.yml
+    name: vaulted_secrets
+
+- name: Create sendgrid-api-key secret
+  containers.podman.podman_secret:
+    name: sendgrid-api-key
+    data: "{{ vaulted_secrets.sendgrid_api_key }}"
+    state: present
+
+- name: Create sender-email secret
+  containers.podman.podman_secret:
+    name: sender-email
+    data: "{{ vaulted_secrets.sender_email }}"
+    state: present
+
+- name: Create destination-email secret
+  containers.podman.podman_secret:
+    name: destination-email
+    data: "{{ vaulted_secrets.destination_email }}"
+    state: present
 
 - name: Copy Portfolio socket unit to user systemd directory
   ansible.builtin.copy:
@@ -16,16 +34,25 @@
     dest: "~/.config/containers/systemd/"
   register: container_copied
 
-- name: Reload systemd and restart socket if configuration changed
+- name: Reload systemd if unit files changed
+  ansible.builtin.systemd:
+    scope: user
+    daemon_reload: yes
+  when: socket_copied.changed or container_copied.changed
+
+- name: Pull latest portfolio image
+  containers.podman.podman_image:
+    name: ghcr.io/jack-turk-5/portfolio-app:latest
+    pull: true
+  register: pull_result
+
+- name: Reload systemd and restart socket if container was updated
   ansible.builtin.systemd:
     scope: user
     daemon_reload: yes
     name: portfolio.socket
     state: restarted
-  when: >
-    image_pulled.changed or
-    socket_copied.changed or
-    container_copied.changed
+  when: pull_result.changed
 
 - name: Ensure Portfolio socket is enabled and started
   ansible.builtin.systemd:
