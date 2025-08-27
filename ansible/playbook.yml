@@ -23,6 +23,7 @@
     - role: portfolio
     - role: wireguard-pro
     - role: vault
+    - role: backup
     - role: caddy
 
 # Play 3: Forgejo User Configuration (run as git)

@@ -8,6 +8,7 @@
       - git
       - acl # Required for become_user to unprivileged users
       - wireguard-tools # For generating keys
+      - unzip # Required for unarchiving rclone
     state: present
 
 - name: Set root user shell to zsh
