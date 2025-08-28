@@ -22,6 +22,18 @@
     data: "{{ vaulted_secrets.destination_email }}"
     state: present
 
+- name: Create portfolio data directory
+  ansible.builtin.file:
+    path: "~/.config/portfolio/data"
+    state: directory
+    mode: '0755'
+
+- name: Copy portfolio data files
+  ansible.builtin.copy:
+    src: "data/"
+    dest: "~/.config/portfolio/data/"
+    mode: '0644'
+
 - name: Copy Portfolio socket unit to user systemd directory
   ansible.builtin.copy:
     src: "portfolio.socket"

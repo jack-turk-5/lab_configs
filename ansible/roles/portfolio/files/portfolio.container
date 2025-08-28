@@ -12,6 +12,7 @@ Secret=sendgrid-api-key
 Secret=sender-email
 Secret=destination-email
 Environment="CORS_ORIGINS=https://jackturk.dev,https://www.jackturk.dev"
+Volume=%h/.config/portfolio/data:/app/data:Z
 Notify=true
 
 [Service]
