@@ -50,7 +50,7 @@ systemctl --user start vault
 
 # 4. Upload to Google Drive
 echo "Uploading backup to Google Drive (${RCLONE_REMOTE}:${REMOTE_DIR})..."
-rclone copy "${BACKUP_FILEPATH}" "${RCLONE_REMOTE}:${REMOTE_DIR}" --progress
+{{ ansible_user_dir }}/.local/bin/rclone copy "${BACKUP_FILEPATH}" "${RCLONE_REMOTE}:${REMOTE_DIR}" --progress
 echo "Upload complete."
 
 # 5. Clean up old local backups
