@@ -78,6 +78,18 @@
     dest: "~/.config/containers/systemd/"
   register: container_copied
 
+- name: "Copy WireGuard Pro firewall configs to user-space configuration directory"
+  ansible.builtin.copy:
+    src: "nftables.conf"
+    dest: "~/.config/wireguard-pro/"
+  register: firewall_copied
+
+- name: "Copy WireguardPro environment values to user space configuration directory"
+  ansible.builtin.copy:
+    src: "env"
+    dest: "~/.config/wireguard-pro/"
+  register: env_copied
+
 - name: Reload systemd if unit files changed
   ansible.builtin.systemd:
     scope: user
@@ -87,7 +99,9 @@
     pass_secret_created.changed or
     (key_secrets_created is defined and key_secrets_created.changed) or
     socket_copied.changed or
-    container_copied.changed
+    container_copied.changed or
+    firewall_copied.changed or
+    env_copied.changed
 
 - name: Pull latest wireguard-pro image
   containers.podman.podman_image:
