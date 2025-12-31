@@ -1,28 +1,20 @@
 [Unit]
-Description=Forgejo via Rootless Sockets (VCS)
-Requires=forgejo.socket
-After=forgejo.socket
+Description=Forgejo Container (VCS)
 
 [Container]
 ContainerName=forgejo
-Image=codeberg.org/forgejo/forgejo:11-rootless
+Image=codeberg.org/forgejo/forgejo:13-rootless
 UserNS=keep-id:uid=1002,gid=1002
-PodmanArgs=--preserve-fds=2
+
+EnvironmentFile=%h/.config/forgejo/env
+
+PublishPort=3000:3000
+PublishPort=3022:3022
 
 Volume=forgejo-conf.volume:/var/lib/gitea:Z,U
 Volume=forgejo-data.volume:/data:Z,U
 Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
 
-AddCapability=CAP_NET_BIND_SERVICE
-Environment=ENABLE_PUSH_CREATE_USER=true
-Environment=SSH_CREATE_AUTHORIZED_KEYS_FILE=false
-Environment=PROTOCOL=http
-Environment=SSH_PORT=3022
-Environment=SSH_DOMAIN=forge.jackturk.dev
-Environment=ROOT_URL=https://forge.jackturk.dev
-
 [Service]
 Restart=on-failure
-Type=notify
-NotifyAccess=main

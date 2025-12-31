@@ -1,0 +1,5 @@
+FORGEJO__repository__ENABLE_PUSH_CREATE_USER=true
+FORGEJO__server__ROOT_URL=https://forge.jackturk.dev
+FORGEJO__server__SSH_DOMAIN=forge.jackturk.dev
+FORGEJO__server__SSH_PORT=3022
+FORGEJO__server__SSH_LISTEN_PORT=3022

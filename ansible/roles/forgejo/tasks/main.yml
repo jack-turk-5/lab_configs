@@ -1,13 +1,21 @@
 ---
-- name: Copy Forgejo socket unit to user systemd directory
+- name: Create forgejo config directory
+  ansible.builtin.file:
+    path: "~/.config/forgejo"
+    state: directory
+    mode: '0755'
+
+- name: Copy Forgejo env file
   ansible.builtin.copy:
-    src: "forgejo.socket"
-    dest: "~/.config/systemd/user/"
+    src: "env"
+    dest: "~/.config/forgejo/env"
+    mode: '0600'
 
 - name: Copy Forgejo container and volume units to user quadlet directory
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "~/.config/containers/systemd/"
+    mode: '0644'
   loop:
     - forgejo.container
     - forgejo-data.volume
@@ -16,11 +24,11 @@
 - name: Reload systemd user daemon to detect new units
   ansible.builtin.systemd:
     scope: user
-    daemon_reload: yes
+    daemon_reload: true
 
-- name: Enable and start Forgejo socket for user
+- name: Enable and start Forgejo service for user
   ansible.builtin.systemd:
     scope: user
-    name: forgejo.socket
-    enabled: yes
+    name: forgejo.service
+    enabled: true
     state: started

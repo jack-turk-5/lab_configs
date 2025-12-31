@@ -38,18 +38,20 @@
   ansible.builtin.copy:
     src: "portfolio.socket"
     dest: "~/.config/systemd/user/"
+    mode: '0644'
   register: socket_copied
 
 - name: Copy Portfolio container unit to user quadlet directory
   ansible.builtin.copy:
     src: "portfolio.container"
     dest: "~/.config/containers/systemd/"
+    mode: '0644'
   register: container_copied
 
 - name: Reload systemd if unit files changed
   ansible.builtin.systemd:
     scope: user
-    daemon_reload: yes
+    daemon_reload: true
   when: socket_copied.changed or container_copied.changed
 
 - name: Pull latest portfolio image
@@ -61,7 +63,7 @@
 - name: Reload systemd and restart socket if container was updated
   ansible.builtin.systemd:
     scope: user
-    daemon_reload: yes
+    daemon_reload: true
     name: portfolio.socket
     state: restarted
   when: pull_result.changed
@@ -70,5 +72,5 @@
   ansible.builtin.systemd:
     scope: user
     name: portfolio.socket
-    enabled: yes
+    enabled: true
     state: started

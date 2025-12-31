@@ -48,6 +48,7 @@
       ansible.builtin.command:
         cmd: wg genkey
       register: wg_privatekey_gen
+      changed_when: false
 
     - name: Store private key in podman secret
       containers.podman.podman_secret:
@@ -59,6 +60,7 @@
         cmd: wg pubkey
         stdin: "{{ wg_privatekey_gen.stdout }}"
       register: wg_publickey_gen
+      changed_when: false
 
     - name: Store public key in podman secret
       containers.podman.podman_secret:
@@ -70,30 +72,34 @@
   ansible.builtin.copy:
     src: "wireguard-pro.socket"
     dest: "~/.config/systemd/user/"
+    mode: '0644'
   register: socket_copied
 
 - name: Copy WireGuard Pro container unit to user quadlet directory
   ansible.builtin.copy:
     src: "wireguard-pro.container"
     dest: "~/.config/containers/systemd/"
+    mode: '0644'
   register: container_copied
 
 - name: "Copy WireGuard Pro firewall configs to user-space configuration directory"
   ansible.builtin.copy:
     src: "nftables.conf"
     dest: "~/.config/wireguard-pro/"
+    mode: '0644'
   register: firewall_copied
 
 - name: "Copy WireguardPro environment values to user space configuration directory"
   ansible.builtin.copy:
     src: "env"
     dest: "~/.config/wireguard-pro/"
+    mode: '0600'
   register: env_copied
 
 - name: Reload systemd if unit files changed
   ansible.builtin.systemd:
     scope: user
-    daemon_reload: yes
+    daemon_reload: true
   when: >
     user_secret_created.changed or
     pass_secret_created.changed or
@@ -112,7 +118,7 @@
 - name: Reload systemd and restart socket if container was updated
   ansible.builtin.systemd:
     scope: user
-    daemon_reload: yes
+    daemon_reload: true
     name: wireguard-pro.socket
     state: restarted
   when: pull_result.changed
@@ -121,5 +127,5 @@
   ansible.builtin.systemd:
     scope: user
     name: wireguard-pro.socket
-    enabled: yes
+    enabled: true
     state: started

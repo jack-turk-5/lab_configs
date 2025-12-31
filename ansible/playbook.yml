@@ -2,7 +2,7 @@
 # Play 1: System Configuration (run as root)
 - name: Configure base system and root user
   hosts: servers
-  become: yes
+  become: true
   vars:
     podman_user: podman
     forgejo_user: git
@@ -13,7 +13,7 @@
 # Play 2: Podman User Configuration (run as podman)
 - name: Configure podman user and services
   hosts: servers
-  become: yes
+  become: true
   become_user: "{{ podman_user }}"
   vars:
     podman_user: podman
@@ -29,9 +29,17 @@
 # Play 3: Forgejo User Configuration (run as git)
 - name: Configure forgejo user and service
   hosts: servers
-  become: yes
+  become: true
   become_user: "{{ forgejo_user }}"
   vars:
     forgejo_user: git
   roles:
     - role: forgejo
+
+- name: Reboot server
+  hosts: servers
+  become: true
+  tasks:
+    - name: Reboot the server
+      ansible.builtin.reboot:
+        msg: "Rebooting server after deployment"
