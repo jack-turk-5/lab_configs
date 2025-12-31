@@ -9,16 +9,19 @@
   ansible.builtin.copy:
     src: Caddyfile
     dest: "~/.config/caddy/Caddyfile"
+    mode: '0644'
 
 - name: Copy Caddy socket unit to user systemd directory
   ansible.builtin.copy:
     src: "caddy.socket"
     dest: "~/.config/systemd/user/"
+    mode: '0644'
 
 - name: Copy Caddy container and network units to user quadlet directory
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "~/.config/containers/systemd/"
+    mode: '0644'
   loop:
     - caddy.container
     - caddy-internal.network

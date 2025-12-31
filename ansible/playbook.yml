@@ -35,3 +35,11 @@
     forgejo_user: git
   roles:
     - role: forgejo
+
+- name: Reboot server
+  hosts: servers
+  become: true
+  tasks:
+    - name: Reboot the server
+      ansible.builtin.reboot:
+        msg: "Rebooting server after deployment"

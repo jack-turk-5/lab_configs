@@ -19,10 +19,10 @@
     proto: "{{ item.proto }}"
     comment: "{{ item.comment }}"
   loop:
-    - { port: '22',    proto: 'tcp', comment: 'Allow SSH access' }
-    - { port: '80',    proto: 'tcp', comment: 'Allow HTTP (Caddy)' }
-    - { port: '443',   proto: 'tcp', comment: 'Allow HTTPS (Caddy)' }
-    - { port: '3022',  proto: 'tcp', comment: 'Forgejo SSH' }
+    - { port: '22', proto: 'tcp', comment: 'Allow SSH access' }
+    - { port: '80', proto: 'tcp', comment: 'Allow HTTP (Caddy)' }
+    - { port: '443', proto: 'tcp', comment: 'Allow HTTPS (Caddy)' }
+    - { port: '3022', proto: 'tcp', comment: 'Forgejo SSH' }
     - { port: '51819', proto: 'tcp', comment: 'wg-access-server' }
     - { port: '51820', proto: 'udp', comment: 'Allow WireGuard VPN' }
 

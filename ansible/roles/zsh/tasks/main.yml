@@ -39,6 +39,7 @@
   ansible.builtin.blockinfile:
     path: "{{ ansible_user_dir }}/.oh-my-zsh/custom/podman.zsh"
     create: true
+    mode: '0644'
     block: |
       export XDG_RUNTIME_DIR=/run/user/$(id -u)
       export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"

@@ -38,12 +38,14 @@
   ansible.builtin.copy:
     src: "portfolio.socket"
     dest: "~/.config/systemd/user/"
+    mode: '0644'
   register: socket_copied
 
 - name: Copy Portfolio container unit to user quadlet directory
   ansible.builtin.copy:
     src: "portfolio.container"
     dest: "~/.config/containers/systemd/"
+    mode: '0644'
   register: container_copied
 
 - name: Reload systemd if unit files changed
