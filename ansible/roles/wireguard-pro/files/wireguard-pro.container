@@ -4,7 +4,7 @@ Requires=wireguard-pro.socket
 After=wireguard-pro.socket
 
 [Container]
-Image=ghcr.io/jack-turk-5/wireguard/wireguard-pro:latest
+Image=ghcr.io/jack-turk-5/wireguard/wireguard-pro:0.0.5
 ContainerName=wireguard-pro
 PublishPort=51820:51820/udp
 Network=slirp4netns:mtu=1500,port_handler=slirp4netns,allow_host_loopback=false,enable_ipv6=true

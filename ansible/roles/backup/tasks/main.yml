@@ -13,7 +13,7 @@
   ansible.builtin.lineinfile:
     path: "{{ ansible_user_dir }}/.zshrc"
     line: 'export PATH=$HOME/.local/bin:$PATH'
-    create: yes
+    create: true
     mode: '0644'
 
 - name: Check if rclone is installed
@@ -35,14 +35,14 @@
       ansible.builtin.unarchive:
         src: https://downloads.rclone.org/rclone-current-linux-amd64.zip
         dest: "{{ temp_dir.path }}"
-        remote_src: yes
+        remote_src: true
 
     - name: Find the rclone binary path
       ansible.builtin.find:
         paths: "{{ temp_dir.path }}"
         patterns: "rclone"
         file_type: file
-        recurse: yes
+        recurse: true
       register: rclone_binary_find
 
     - name: Fail if rclone binary is not found
@@ -55,7 +55,7 @@
         src: "{{ rclone_binary_find.files[0].path }}"
         dest: "{{ ansible_user_dir }}/.local/bin/rclone"
         mode: '0755'
-        remote_src: yes
+        remote_src: true
 
     - name: Clean up temporary directory
       ansible.builtin.file:

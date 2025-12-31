@@ -7,7 +7,8 @@ After=forgejo.socket
 ContainerName=forgejo
 Image=codeberg.org/forgejo/forgejo:11-rootless
 UserNS=keep-id:uid=1002,gid=1002
-PodmanArgs=--preserve-fds=2
+PodmanArgs=--preserve-fds=1
+PublishPort=3022:22
 
 Volume=forgejo-conf.volume:/var/lib/gitea:Z,U
 Volume=forgejo-data.volume:/data:Z,U

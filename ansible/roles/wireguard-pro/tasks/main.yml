@@ -93,7 +93,7 @@
 - name: Reload systemd if unit files changed
   ansible.builtin.systemd:
     scope: user
-    daemon_reload: yes
+    daemon_reload: true
   when: >
     user_secret_created.changed or
     pass_secret_created.changed or
@@ -112,7 +112,7 @@
 - name: Reload systemd and restart socket if container was updated
   ansible.builtin.systemd:
     scope: user
-    daemon_reload: yes
+    daemon_reload: true
     name: wireguard-pro.socket
     state: restarted
   when: pull_result.changed
@@ -121,5 +121,5 @@
   ansible.builtin.systemd:
     scope: user
     name: wireguard-pro.socket
-    enabled: yes
+    enabled: true
     state: started

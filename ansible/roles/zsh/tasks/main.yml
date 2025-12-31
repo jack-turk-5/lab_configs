@@ -3,7 +3,7 @@
   ansible.builtin.user:
     name: "{{ ansible_user_id }}"
     shell: /bin/zsh
-  become: yes # This task needs to become root to modify /etc/passwd
+  become: true # This task needs to become root to modify /etc/passwd
 
 - name: Check if Oh My Zsh is installed
   ansible.builtin.stat:
@@ -38,7 +38,7 @@
 - name: Create custom zsh config for Podman environment variables
   ansible.builtin.blockinfile:
     path: "{{ ansible_user_dir }}/.oh-my-zsh/custom/podman.zsh"
-    create: yes
+    create: true
     block: |
       export XDG_RUNTIME_DIR=/run/user/$(id -u)
       export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
