@@ -13,7 +13,7 @@
 
     - name: "Copy backup script for {{ backup_item.name }}"
       ansible.builtin.template:
-        src: backup.sh.j2
+        src: "{{ (backup_item | default({})).backup_script_template | default('backup.sh.j2') }}"
         dest: "{{ ansible_facts['user_dir'] }}/.local/bin/backup-{{ backup_item.name }}.sh"
         mode: '0755'
       vars:
@@ -24,7 +24,7 @@
         rclone_remote: "{{ backup_item.rclone_remote }}"
         remote_dir: "{{ backup_item.remote_dir }}"
         local_retention_days: "{{ backup_item.local_retention_days }}"
-        container_name: "{{ backup_item.container_name }}"
+        service_name: "{{ backup_item.service_name }}"
 
     - name: "Copy systemd service file for {{ backup_item.name }}"
       ansible.builtin.template:

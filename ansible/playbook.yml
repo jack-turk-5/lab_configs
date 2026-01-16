@@ -22,7 +22,7 @@
         source_dirs:
           - "{{ ansible_facts['user_dir'] }}/.config/vault/data"
         local_backup_dir: "{{ ansible_facts['user_dir'] }}/vaultwarden_backups"
-        container_name: vault
+        service_name: vault
         rclone_remote: "gdrive"
         remote_dir: "Backups/Vaultwarden"
         local_retention_days: 7
@@ -51,14 +51,15 @@
     forgejo_user: git
     forgejo_backups:
       - name: forgejo
-        source_dirs:
+        source_dirs:  
           - "{{ ansible_facts['user_dir'] }}/.config/forgejo/forgejo-data"
           - "{{ ansible_facts['user_dir'] }}/.config/forgejo/forgejo-conf"
         local_backup_dir: "{{ ansible_facts['user_dir'] }}/forgejo_backups"
-        container_name: forgejo
+        service_name: forgejo
         rclone_remote: "gdrive"
         remote_dir: "Backups/Forgejo"
         local_retention_days: 7
+        backup_script_template: backup_forgejo.sh.j2
   roles:
     - role: forgejo
   tasks:

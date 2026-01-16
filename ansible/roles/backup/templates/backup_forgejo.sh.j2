@@ -1,0 +1,48 @@
+#!/bin/bash
+set -e
+set -u
+set -o pipefail
+
+# --- Configuration ---
+BACKUP_DIR="{{ local_backup_dir }}"
+RCLONE_REMOTE="{{ rclone_remote }}"
+REMOTE_DIR="{{ remote_dir }}"
+LOCAL_RETENTION_DAYS="{{ local_retention_days }}"
+SERVICE_NAME="{{ service_name }}"
+
+# --- Script ---
+TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
+LOG_FILE="{{ ansible_facts['user_dir'] }}/{{ backup_name }}_backup.log"
+exec > >(tee -a "${LOG_FILE}") 2>&1
+
+echo "--- Starting {{ backup_name }} Backup: ${TIMESTAMP} ---"
+
+mkdir -p "${BACKUP_DIR}"
+
+BACKUP_FILENAME="{{ backup_name }}-backup-${TIMESTAMP}.zip" # forgejo dump creates a zip
+BACKUP_FILEPATH="${BACKUP_DIR}/${BACKUP_FILENAME}"
+
+echo "Performing Forgejo dump inside container '${SERVICE_NAME}'"
+# Execute forgejo dump inside the container. The dump path should be accessible from the host later.
+# We are dumping to a temporary path inside the container, which is then copied to the host.
+# This avoids issues with bind mounts being inaccessible from inside the container for dumping.
+PODMAN_TMP_DUMP_PATH="/tmp/forgejo_dump-${TIMESTAMP}.zip"
+podman exec "${SERVICE_NAME}" forgejo dump --file "${PODMAN_TMP_DUMP_PATH}" --config /var/lib/gitea/custom/conf/app.ini
+echo "Copying dump from container to host"
+# Use podman cp to get the dump file from the container to the host
+podman cp "${SERVICE_NAME}":"${PODMAN_TMP_DUMP_PATH}" "${BACKUP_FILEPATH}"
+
+echo "Cleaning up temporary dump file in container"
+podman exec "${SERVICE_NAME}" rm "${PODMAN_TMP_DUMP_PATH}"
+
+echo "Uploading backup to ${RCLONE_REMOTE}:${REMOTE_DIR}"
+rclone copy "${BACKUP_FILEPATH}" "${RCLONE_REMOTE}:${REMOTE_DIR}" --progress
+echo "Upload complete."
+
+echo "Cleaning up local temporary files"
+rm -f "${BACKUP_FILEPATH}"
+
+echo "Cleaning up old local backups (zip files) older than ${LOCAL_RETENTION_DAYS} days"
+find "${BACKUP_DIR}" -type f -name "{{ backup_name }}-backup-*.zip" -mtime +"${LOCAL_RETENTION_DAYS}" -exec rm -v {} \;
+
+echo "--- Backup Finished Successfully: ${TIMESTAMP} ---"
