@@ -1,0 +1,6 @@
+[Unit]
+Description=Backup Service for {{ backup_item.name }}
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/backup-{{ backup_item.name }}.sh

@@ -1,116 +1,62 @@
 ---
-- name: Ensure user directories exist
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    mode: '0755'
-  loop:
-    - "{{ ansible_user_dir }}/.local/bin"
-    - "{{ ansible_user_dir }}/.config/systemd/user"
-    - "{{ ansible_user_dir }}/vaultwarden_backups"
-
-- name: Ensure ~/.local/bin is in PATH (for zsh)
-  ansible.builtin.lineinfile:
-    path: "{{ ansible_user_dir }}/.zshrc"
-    line: 'export PATH=$HOME/.local/bin:$PATH'
-    create: true
-    mode: '0644'
-
-- name: Check if rclone is installed
-  ansible.builtin.shell: 'source {{ ansible_user_dir }}/.zshrc && command -v rclone'
-  register: rclone_check
-  changed_when: false
-  failed_when: false
-
-- name: Install rclone if not present
-  when: rclone_check.rc != 0
+- name: "Manage backup configuration for {{ backup_item.name }}"
   block:
-    - name: Create temporary directory for rclone download
-      ansible.builtin.tempfile:
-        state: directory
-        suffix: rclone
-      register: temp_dir
-
-    - name: Download and unzip rclone
-      ansible.builtin.unarchive:
-        src: https://downloads.rclone.org/rclone-current-linux-amd64.zip
-        dest: "{{ temp_dir.path }}"
-        remote_src: true
-
-    - name: Find the rclone binary path
-      ansible.builtin.find:
-        paths: "{{ temp_dir.path }}"
-        patterns: "rclone"
-        file_type: file
-        recurse: true
-      register: rclone_binary_find
-
-    - name: Fail if rclone binary is not found
-      ansible.builtin.fail:
-        msg: "Could not find the 'rclone' binary in the unzipped archive."
-      when: not rclone_binary_find.files
-
-    - name: Copy rclone binary to ~/.local/bin
-      ansible.builtin.copy:
-        src: "{{ rclone_binary_find.files[0].path }}"
-        dest: "{{ ansible_user_dir }}/.local/bin/rclone"
-        mode: '0755'
-        remote_src: true
-
-    - name: Clean up temporary directory
+    - name: "Ensure user directories exist for {{ backup_item.name }}"
       ansible.builtin.file:
-        path: "{{ temp_dir.path }}"
-        state: absent
-      when: temp_dir.path is defined
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ ansible_facts['user_dir'] }}/.local/bin"
+        - "{{ ansible_facts['user_dir'] }}/.config/systemd/user"
+        - "{{ backup_item.local_backup_dir }}"
 
-- name: Copy backup script
-  ansible.builtin.template:
-    src: backup-vaultwarden.sh.j2
-    dest: "{{ ansible_user_dir }}/.local/bin/backup-vaultwarden.sh"
-    mode: '0755'
+    - name: "Copy backup script for {{ backup_item.name }}"
+      ansible.builtin.template:
+        src: "{{ (backup_item | default({})).backup_script_template | default('backup.sh.j2') }}"
+        dest: "{{ ansible_facts['user_dir'] }}/.local/bin/backup-{{ backup_item.name }}.sh"
+        mode: '0755'
+      vars:
+        # Pass all backup_item variables to the template
+        backup_name: "{{ backup_item.name }}"
+        source_dirs: "{{ backup_item.source_dirs }}"
+        local_backup_dir: "{{ backup_item.local_backup_dir }}"
+        rclone_remote: "{{ backup_item.rclone_remote }}"
+        remote_dir: "{{ backup_item.remote_dir }}"
+        local_retention_days: "{{ backup_item.local_retention_days }}"
+        service_name: "{{ backup_item.service_name }}"
 
-- name: Copy systemd service file
-  ansible.builtin.copy:
-    src: backup.service
-    dest: "{{ ansible_user_dir }}/.config/systemd/user/backup-vaultwarden.service"
-    mode: '0644'
+    - name: "Copy systemd service file for {{ backup_item.name }}"
+      ansible.builtin.template:
+        src: backup.service.j2
+        dest: "{{ ansible_facts['user_dir'] }}/.config/systemd/user/backup-{{ backup_item.name }}.service"
+        mode: '0644'
 
-- name: Copy systemd timer file
-  ansible.builtin.copy:
-    src: backup.timer
-    dest: "{{ ansible_user_dir }}/.config/systemd/user/backup-vaultwarden.timer"
-    mode: '0644'
+    - name: "Copy systemd timer file for {{ backup_item.name }}"
+      ansible.builtin.template:
+        src: backup.timer.j2
+        dest: "{{ ansible_facts['user_dir'] }}/.config/systemd/user/backup-{{ backup_item.name }}.timer"
+        mode: '0644'
 
-- name: Reload systemd daemon for user
-  ansible.builtin.systemd:
-    scope: user
-    daemon_reload: true
+    - name: "Reload systemd daemon for user ({{ ansible_facts['user_id'] }})"
+      ansible.builtin.systemd:
+        scope: user
+        daemon_reload: true
 
-- name: Enable and start the user backup timer
-  ansible.builtin.systemd:
-    scope: user
-    name: backup-vaultwarden.timer
-    enabled: true
-    state: started
+    - name: "Enable and start the user backup timer for {{ backup_item.name }}"
+      ansible.builtin.systemd:
+        scope: user
+        name: "backup-{{ backup_item.name }}.timer"
+        enabled: true
+        state: started
 
-- name: Prompt user to configure rclone
+- name: "Prompt user to configure rclone for current user"
   ansible.builtin.debug:
     msg:
-      - "IMPORTANT: The backup system is installed, but you must configure rclone."
-      - "Log in to your server as the '{{ ansible_user_gid }}' user and run:"
+      - "IMPORTANT: The backup system is installed for the '{{ ansible_facts['user_id'] }}' user, but you must configure rclone for it to work."
+      - "---"
+      - "Log in to your server as the '{{ ansible_facts['user_id'] }}' user and run:"
       - "  rclone config"
-      - "Follow the prompts to set up a new remote for Google Drive."
-      - "1. Choose 'n' for a new remote."
-      - "2. Name it 'gdrive' (this is important for the script to work)."
-      - "3. Select the number corresponding to 'Google Drive'."
-      - "4. Leave 'client_id' and 'client_secret' blank."
-      - "5. Choose '1' for 'Full access'."
-      - "6. Leave 'root_folder_id' blank."
-      - "7. Leave 'service_account_file' blank."
-      - "8. Say 'n' to 'Edit advanced config'."
-      - "9. Say 'y' to 'Use auto config'. rclone will give you a link to open in your browser."
-      - "10. Open the link, authorize rclone with your Google account, and copy the verification code back to the terminal."
-      - "11. Say 'n' to 'Configure this as a team drive'."
-      - "12. Say 'y' to accept the configuration."
-      - "13. Finally, 'q' to quit the configuration."
-      - "Your backups will start on the next scheduled run (daily)."
+      - "---"
+      - "Follow the prompts to set up a new remote. It is recommended to name it 'gdrive' as this is the default in the backup configuration."
+

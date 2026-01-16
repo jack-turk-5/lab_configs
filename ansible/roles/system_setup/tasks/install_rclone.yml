@@ -1,0 +1,50 @@
+---
+
+- name: Check if rclone is installed system-wide
+  ansible.builtin.command: 'command -v rclone'
+  register: rclone_check_systemwide
+  changed_when: false
+  failed_when: false
+
+- name: Install rclone system-wide if not present
+  when: rclone_check_systemwide.rc != 0
+  block:
+    - name: Create temporary directory for rclone download
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: rclone
+      register: temp_dir
+
+    - name: Download and unzip rclone
+      ansible.builtin.unarchive:
+        src: https://downloads.rclone.org/rclone-current-linux-amd64.zip
+        dest: "{{ temp_dir.path }}"
+        remote_src: true
+
+    - name: Find the rclone binary path
+      ansible.builtin.find:
+        paths: "{{ temp_dir.path }}"
+        patterns: "rclone"
+        file_type: file
+        recurse: true
+      register: rclone_binary_find
+
+    - name: Fail if rclone binary is not found
+      ansible.builtin.fail:
+        msg: "Could not find the 'rclone' binary in the unzipped archive."
+      when: not rclone_binary_find.files
+
+    - name: Copy rclone binary to /usr/local/bin
+      ansible.builtin.copy:
+        src: "{{ rclone_binary_find.files[0].path }}"
+        dest: "/usr/local/bin/rclone"
+        remote_src: true
+        mode: '0755'
+      become: true
+
+    - name: Clean up temporary directory
+      ansible.builtin.file:
+        path: "{{ temp_dir.path }}"
+        state: absent
+      when: temp_dir.path is defined
+
