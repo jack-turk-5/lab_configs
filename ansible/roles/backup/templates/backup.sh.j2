@@ -1,0 +1,57 @@
+#!/bin/bash
+set -e
+set -u
+set -o pipefail
+
+# --- Configuration ---
+SOURCE_DIRS_STR="{{ source_dirs | join(' ') }}"
+BACKUP_DIR="{{ local_backup_dir }}"
+RCLONE_REMOTE="{{ rclone_remote }}"
+REMOTE_DIR="{{ remote_dir }}"
+LOCAL_RETENTION_DAYS="{{ local_retention_days }}"
+CONTAINER_NAME="{{ container_name }}"
+
+# --- Script ---
+TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
+LOG_FILE="{{ ansible_facts['user_dir'] }}/{{ backup_name }}_backup.log"
+exec > >(tee -a "${LOG_FILE}") 2>&1
+
+echo "--- Starting {{ backup_name }} Backup: ${TIMESTAMP} ---"
+
+read -r -a SOURCE_DIRS_ARR <<< "$SOURCE_DIRS_STR"
+
+# Check if source directories exist
+for DIR in "${SOURCE_DIRS_ARR[@]}"; do
+  if [ ! -d "${DIR}" ]; then
+    echo "Error: Source directory '${DIR}' not found." >&2
+    exit 1
+  fi
+done
+
+mkdir -p "${BACKUP_DIR}"
+
+BACKUP_FILENAME="{{ backup_name }}-backup-${TIMESTAMP}.tar.gz"
+BACKUP_FILEPATH="${BACKUP_DIR}/${BACKUP_FILENAME}"
+
+echo "Stopping {{ container_name }} container..."
+podman stop "${CONTAINER_NAME}" || true
+
+echo "Creating backup archive..."
+TAR_ARGS=""
+for DIR in "${SOURCE_DIRS_ARR[@]}"; do
+  TAR_ARGS+=" -C '${DIR}' ."
+done
+tar -czf "${BACKUP_FILEPATH}" ${TAR_ARGS}
+echo "Backup created at ${BACKUP_FILEPATH}"
+
+echo "Starting {{ container_name }} container..."
+podman start "${CONTAINER_NAME}"
+
+echo "Uploading backup to ${RCLONE_REMOTE}:${REMOTE_DIR}..."
+rclone copy "${BACKUP_FILEPATH}" "${RCLONE_REMOTE}:${REMOTE_DIR}" --progress
+echo "Upload complete."
+
+echo "Cleaning up local backups older than ${LOCAL_RETENTION_DAYS} days..."
+find "${BACKUP_DIR}" -type f -name "{{ backup_name }}-backup-*.tar.gz" -mtime +"${LOCAL_RETENTION_DAYS}" -exec rm -v {} \;
+
+echo "--- Backup Finished Successfully: ${TIMESTAMP} ---"

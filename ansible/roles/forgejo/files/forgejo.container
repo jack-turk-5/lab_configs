@@ -11,8 +11,8 @@ EnvironmentFile=%h/.config/forgejo/env
 PublishPort=3000:3000
 PublishPort=3022:3022
 
-Volume=forgejo-conf.volume:/var/lib/gitea:Z,U
-Volume=forgejo-data.volume:/data:Z,U
+Volume=%h/.config/forgejo/forgejo-conf:/var/lib/gitea:Z,U
+Volume=%h/.config/forgejo/forgejo-data:/data:Z,U
 Volume=/etc/timezone:/etc/timezone:ro
 Volume=/etc/localtime:/etc/localtime:ro
 

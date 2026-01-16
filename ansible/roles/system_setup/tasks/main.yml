@@ -24,3 +24,6 @@
   loop:
     - "{{ podman_user }}"
     - "{{ forgejo_user }}"
+
+- name: Install rclone
+  include_tasks: install_rclone.yml
