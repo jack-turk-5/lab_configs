@@ -1,1 +1,2 @@
-WG_ENDPOINT=vpn.jackturk.dev:51820
+WG_HOST=vpn.jackturk.dev
+WG_PORT=51820
