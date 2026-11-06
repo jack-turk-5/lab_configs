@@ -4,6 +4,45 @@
     file: ../../secrets.yml
     name: vaulted_secrets
 
+# Rootless containers can't use /dev/net/tun under SELinux's default container policy
+- name: Install SELinux policy module for WireGuard Pro TUN access
+  when: ansible_facts['selinux']['status'] == 'enabled'
+  become_user: root
+  block:
+    - name: Ensure SELinux policy compiler is installed
+      ansible.builtin.package:
+        name: checkpolicy
+        state: present
+
+    - name: Create SELinux module directory
+      ansible.builtin.file:
+        path: /usr/local/share/selinux/wireguard_pro_tun
+        state: directory
+        mode: '0755'
+
+    - name: Copy SELinux module source
+      ansible.builtin.copy:
+        src: wireguard_pro_tun.te
+        dest: /usr/local/share/selinux/wireguard_pro_tun/wireguard_pro_tun.te
+        mode: '0644'
+      register: selinux_te_copied
+
+    - name: Check if SELinux module is loaded
+      ansible.builtin.shell:
+        cmd: semodule -l | grep -qx wireguard_pro_tun
+      register: selinux_module_check
+      failed_when: false
+      changed_when: false
+
+    - name: Compile and load SELinux module
+      ansible.builtin.shell:
+        cmd: >
+          checkmodule -M -m -o wireguard_pro_tun.mod wireguard_pro_tun.te &&
+          semodule_package -o wireguard_pro_tun.pp -m wireguard_pro_tun.mod &&
+          semodule -i wireguard_pro_tun.pp
+        chdir: /usr/local/share/selinux/wireguard_pro_tun
+      when: selinux_te_copied.changed or selinux_module_check.rc != 0
+
 - name: Check if WireGuard admin-user secret exists
   ansible.builtin.command:
     cmd: podman secret exists admin-user

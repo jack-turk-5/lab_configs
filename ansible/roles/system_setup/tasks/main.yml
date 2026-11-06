@@ -1,19 +1,93 @@
 ---
+- name: Enable Oracle EPEL repository (provides fish, fastfetch and rclone)
+  ansible.builtin.dnf:
+    name: "oracle-epel-release-el{{ ansible_facts['distribution_major_version'] }}"
+    state: present
+
+# Oracle's EPEL repo ids change between releases (e.g. ol10_u2_developer_EPEL), so look them up
+- name: Find EPEL repository ids
+  ansible.builtin.shell:
+    cmd: set -o pipefail && dnf repolist --all --quiet | awk 'NR > 1 && tolower($1) ~ /epel/ { print $1 }'
+  register: epel_repos
+  changed_when: false
+  failed_when: epel_repos.rc != 0 or not epel_repos.stdout_lines
+
+- name: Enable EPEL repositories
+  community.general.dnf_config_manager:
+    name: "{{ epel_repos.stdout_lines }}"
+    state: enabled
+
 - name: Install base system packages
   ansible.builtin.package:
     name:
-      - zsh
+      - fish
+      - fastfetch
       - podman
-      - ufw
+      - passt # Provides pasta for rootless podman networking
+      - firewalld
       - git
       - acl # Required for become_user to unprivileged users
-      - unzip # Required for unarchiving rclone
+      - rclone # Backups to Google Drive
     state: present
 
-- name: Set root user shell to zsh
+# kitten ssh only installs terminfo for the login user, so install it system-wide for sudo/su sessions
+- name: Copy kitty terminfo source
+  ansible.builtin.copy:
+    src: kitty.terminfo
+    dest: /usr/local/share/kitty.terminfo
+    mode: '0644'
+  register: kitty_terminfo
+
+- name: Compile kitty terminfo system-wide
+  ansible.builtin.command:
+    cmd: tic -x -o /usr/share/terminfo /usr/local/share/kitty.terminfo
+  when: kitty_terminfo.changed
+
+- name: Ensure system fish conf.d directory exists
+  ansible.builtin.file:
+    path: /etc/fish/conf.d
+    state: directory
+    mode: '0755'
+
+# Gives every user kitty's cursor shape, prompt marks, etc. when connected from kitty
+- name: Install kitty shell integration for fish system-wide
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /etc/fish/conf.d/
+    mode: '0644'
+  loop:
+    - kitty-enable.fish
+    - kitty-shell-integration.fish
+
+- name: Include encrypted variables
+  ansible.builtin.include_vars:
+    file: ../../secrets.yml
+    name: vaulted_secrets
+
+# Created in this order so podman gets uid 1001 and git gets uid 1002 (opc is 1000)
+# The salt is derived from the password so the hash stays stable between runs
+- name: Create service users
   ansible.builtin.user:
-    name: root
-    shell: /bin/zsh
+    name: "{{ item.name }}"
+    shell: "{{ item.shell }}"
+    password: "{{ item.password | default(omit) }}"
+    create_home: true
+  loop:
+    - name: "{{ podman_user }}"
+      shell: /usr/bin/fish
+      password: "{{ vaulted_secrets.podman_password | password_hash('sha512', (vaulted_secrets.podman_password | hash('sha1'))[:16]) }}"
+    - name: "{{ forgejo_user }}"
+      shell: /sbin/nologin # Forgejo serves SSH itself on 3022
+  loop_control:
+    label: "{{ item.name }}"
+  no_log: true
+
+- name: Allow rootless Caddy socket to bind ports 80 and 443
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_unprivileged_port_start
+    value: '80'
+    sysctl_file: /etc/sysctl.d/99-unprivileged-ports.conf
+    state: present
 
 - name: Enable linger for service users
   ansible.builtin.command:
@@ -23,6 +97,3 @@
   loop:
     - "{{ podman_user }}"
     - "{{ forgejo_user }}"
-
-- name: Install rclone
-  include_tasks: install_rclone.yml

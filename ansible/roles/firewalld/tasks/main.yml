@@ -1,0 +1,30 @@
+---
+- name: Ensure firewalld package is installed
+  ansible.builtin.package:
+    name: firewalld
+    state: present
+
+- name: Enable and start firewalld
+  ansible.builtin.systemd:
+    name: firewalld
+    enabled: true
+    state: started
+
+- name: Allow SSH access
+  ansible.posix.firewalld:
+    service: ssh
+    permanent: true
+    immediate: true
+    state: enabled
+
+- name: Apply firewalld port rules
+  ansible.posix.firewalld:
+    port: "{{ item.port }}/{{ item.proto }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  loop:
+    - { port: '80', proto: 'tcp' }    # HTTP (Caddy)
+    - { port: '443', proto: 'tcp' }   # HTTPS (Caddy)
+    - { port: '3022', proto: 'tcp' }  # Forgejo SSH
+    - { port: '51820', proto: 'udp' } # WireGuard VPN
