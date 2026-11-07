@@ -4,10 +4,10 @@
     file: ../../secrets.yml
     name: vaulted_secrets
 
-- name: Create sendgrid-api-key secret
+- name: Create resend-api-key secret
   containers.podman.podman_secret:
-    name: sendgrid-api-key
-    data: "{{ vaulted_secrets.sendgrid_api_key }}"
+    name: resend-api-key
+    data: "{{ vaulted_secrets.resend_api_key }}"
     state: present
 
 - name: Create sender-email secret

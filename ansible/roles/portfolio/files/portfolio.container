@@ -8,7 +8,7 @@ Image=ghcr.io/jack-turk-5/portfolio-app:latest
 ContainerName=portfolio
 AutoUpdate=registry
 PodmanArgs=--preserve-fds=1
-Secret=sendgrid-api-key
+Secret=resend-api-key
 Secret=sender-email
 Secret=destination-email
 Environment="CORS_ORIGINS=https://jackturk.dev,https://www.jackturk.dev"
