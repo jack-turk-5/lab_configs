@@ -34,7 +34,7 @@ https://vpn.jackturk.dev https://forge.jackturk.dev https://vault.jackturk.dev h
 	handle @portfolio {
 		reverse_proxy /* host.containers.internal:8081 {
 			header_up Host {host}
-			header_up X-Real-IP {remote}
+			header_up X-Real-IP {remote_host}
 		}
 	}
 
@@ -42,7 +42,7 @@ https://vpn.jackturk.dev https://forge.jackturk.dev https://vault.jackturk.dev h
 	handle @vpn {
 		reverse_proxy /* host.containers.internal:51819 {
 			header_up Host {host}
-			header_up X-Real-IP {remote}
+			header_up X-Real-IP {remote_host}
 		}
 	}
 
@@ -55,7 +55,7 @@ https://vpn.jackturk.dev https://forge.jackturk.dev https://vault.jackturk.dev h
 	handle @vault {
 		reverse_proxy /* host.containers.internal:8080 {
 			header_up Host {host}
-			header_up X-Real-IP {remote}
+			header_up X-Real-IP {remote_host}
 		}
 	}
 }

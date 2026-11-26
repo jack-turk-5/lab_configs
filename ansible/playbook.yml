@@ -11,6 +11,7 @@
     - role: sshd
     - role: auto_updates
     - role: firewalld
+    - role: fail2ban
 
 # Play 2: Admin User Configuration (run as the SSH user)
 - name: Configure admin user shell

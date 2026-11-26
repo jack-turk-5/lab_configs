@@ -1,0 +1,19 @@
+[DEFAULT]
+backend = systemd
+banaction = firewallcmd-ipset[actiontype=<allports>]
+banaction_allports = firewallcmd-ipset[actiontype=<allports>]
+bantime = 1h
+bantime.increment = true
+findtime = 10m
+maxretry = 5
+ignoreip = 127.0.0.1/8 ::1 {{ fail2ban_ignoreip | join(' ') }}
+
+[sshd]
+enabled = true
+
+# Rootless container logs land in per-user journals, which the default journal flags skip
+[vaultwarden]
+enabled = true
+filter = vaultwarden
+backend = systemd[journalflags=1]
+journalmatch = CONTAINER_NAME=vaultwarden

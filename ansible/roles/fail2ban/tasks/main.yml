@@ -1,0 +1,30 @@
+---
+- name: Install fail2ban with firewalld and journal support
+  ansible.builtin.package:
+    name:
+      - fail2ban-server
+      - fail2ban-firewalld
+      - python3-systemd
+    state: present
+
+- name: Install fail2ban filters
+  ansible.builtin.copy:
+    src: "filter.d/{{ item }}"
+    dest: "/etc/fail2ban/filter.d/{{ item }}"
+    mode: '0644'
+  loop:
+    - vaultwarden.conf
+  notify: Restart fail2ban
+
+- name: Configure fail2ban jails
+  ansible.builtin.template:
+    src: 90-local.conf.j2
+    dest: /etc/fail2ban/jail.d/90-local.conf
+    mode: '0644'
+  notify: Restart fail2ban
+
+- name: Enable fail2ban
+  ansible.builtin.systemd:
+    name: fail2ban
+    enabled: true
+    state: started
