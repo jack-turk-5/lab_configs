@@ -1,0 +1,3 @@
+---
+# never | when-changed | when-needed
+auto_updates_reboot: when-needed

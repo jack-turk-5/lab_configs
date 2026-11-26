@@ -9,6 +9,7 @@
   roles:
     - role: system_setup
     - role: sshd
+    - role: auto_updates
     - role: firewalld
 
 # Play 2: Admin User Configuration (run as the SSH user)
