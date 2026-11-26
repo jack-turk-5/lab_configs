@@ -1,6 +1,5 @@
 {
 	# socket‑activation: fd3=80/tcp, fd4=443/tcp, fd5=443/udp, fd6=admin
-	debug
 	admin fd/6
 }
 
@@ -16,6 +15,14 @@ https://vpn.jackturk.dev https://forge.jackturk.dev https://vault.jackturk.dev h
 		protocols h1 h2
 	}
 	encode gzip
+	log
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
 
 	# 1) Preflight matcher
 	@preflight {
@@ -40,6 +47,9 @@ https://vpn.jackturk.dev https://forge.jackturk.dev https://vault.jackturk.dev h
 
 	@vpn host vpn.jackturk.dev
 	handle @vpn {
+		@vpn_denied not remote_ip {{ vaulted_secrets.admin_allow_ips | join(' ') }}
+		respond @vpn_denied 403
+
 		reverse_proxy /* host.containers.internal:51819 {
 			header_up Host {host}
 			header_up X-Real-IP {remote_host}
@@ -53,6 +63,12 @@ https://vpn.jackturk.dev https://forge.jackturk.dev https://vault.jackturk.dev h
 
 	@vault host vault.jackturk.dev
 	handle @vault {
+		@vault_admin_denied {
+			path /admin*
+			not remote_ip {{ vaulted_secrets.admin_allow_ips | join(' ') }}
+		}
+		respond @vault_admin_denied 403
+
 		reverse_proxy /* host.containers.internal:8080 {
 			header_up Host {host}
 			header_up X-Real-IP {remote_host}

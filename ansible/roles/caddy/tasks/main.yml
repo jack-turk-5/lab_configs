@@ -5,9 +5,14 @@
     state: directory
     mode: '0755'
 
-- name: Copy Caddyfile to user config
-  ansible.builtin.copy:
-    src: Caddyfile
+- name: Include encrypted variables
+  ansible.builtin.include_vars:
+    file: ../../secrets.yml
+    name: vaulted_secrets
+
+- name: Template Caddyfile to user config
+  ansible.builtin.template:
+    src: Caddyfile.j2
     dest: "~/.config/caddy/Caddyfile"
     mode: '0644'
 
