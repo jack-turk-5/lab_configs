@@ -1,0 +1,17 @@
+PermitRootLogin no
+PubkeyAuthentication yes
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PermitEmptyPasswords no
+AuthenticationMethods publickey
+
+# Only the admin user may log in; service users (podman, git) are reached via sudo
+AllowUsers {{ sshd_allow_users | join(' ') }}
+
+MaxAuthTries 3
+LoginGraceTime 30
+X11Forwarding no
+
+# Drop dead sessions after ~10 minutes
+ClientAliveInterval 300
+ClientAliveCountMax 2

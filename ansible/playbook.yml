@@ -8,6 +8,7 @@
     forgejo_user: git
   roles:
     - role: system_setup
+    - role: sshd
     - role: firewalld
 
 # Play 2: Admin User Configuration (run as the SSH user)
