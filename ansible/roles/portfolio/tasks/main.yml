@@ -54,19 +54,12 @@
     daemon_reload: true
   when: socket_copied.changed or container_copied.changed
 
-- name: Pull latest portfolio image
-  containers.podman.podman_image:
-    name: ghcr.io/jack-turk-5/portfolio-app:latest
-    pull: true
-  register: pull_result
-
-- name: Reload systemd and restart socket if container was updated
+- name: Restart Portfolio if its container unit changed
   ansible.builtin.systemd:
     scope: user
-    daemon_reload: true
-    name: portfolio.socket
+    name: portfolio.service
     state: restarted
-  when: pull_result.changed
+  when: container_copied.changed
 
 - name: Ensure Portfolio socket is enabled and started
   ansible.builtin.systemd:

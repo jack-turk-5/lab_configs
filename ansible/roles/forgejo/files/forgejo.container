@@ -3,7 +3,8 @@ Description=Forgejo Container (VCS)
 
 [Container]
 ContainerName=forgejo
-Image=codeberg.org/forgejo/forgejo:16-rootless
+Image=codeberg.org/forgejo/forgejo:17-rootless
+AutoUpdate=registry
 UserNS=keep-id:uid=1002,gid=1002
 
 EnvironmentFile=%h/.config/forgejo/env

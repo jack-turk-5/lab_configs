@@ -5,7 +5,8 @@ After=wireguard-pro.service forgejo.service vault.service portfolio.service cadd
 
 [Container]
 ContainerName=caddy
-Image=docker.io/caddy:latest
+Image=docker.io/library/caddy:2
+AutoUpdate=registry
 Network=caddy-internal.network
 Notify=true
 Volume=%h/.config/caddy/Caddyfile:/etc/caddy/Caddyfile:Z

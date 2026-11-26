@@ -113,19 +113,12 @@
     firewall_copied.changed or
     env_copied.changed
 
-- name: Pull latest wireguard-pro image
-  containers.podman.podman_image:
-    name: ghcr.io/jack-turk-5/wireguard/wireguard-pro:latest
-    pull: true
-  register: pull_result
-
-- name: Reload systemd and restart socket if container was updated
+- name: Restart WireGuard Pro if its container unit changed
   ansible.builtin.systemd:
     scope: user
-    daemon_reload: true
-    name: wireguard-pro.socket
+    name: wireguard-pro.service
     state: restarted
-  when: pull_result.changed
+  when: container_copied.changed
 
 - name: Ensure WireGuard Pro socket is enabled and started
   ansible.builtin.systemd:

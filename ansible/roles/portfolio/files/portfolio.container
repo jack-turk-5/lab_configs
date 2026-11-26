@@ -4,9 +4,8 @@ Requires=portfolio.socket
 After=portfolio.socket
 
 [Container]
-Image=ghcr.io/jack-turk-5/portfolio-app:latest
+Image=ghcr.io/jack-turk-5/portfolio-app:0.0.6
 ContainerName=portfolio
-AutoUpdate=registry
 PodmanArgs=--preserve-fds=1
 Secret=resend-api-key
 Secret=sender-email

@@ -4,7 +4,7 @@ Requires=wireguard-pro.socket
 After=wireguard-pro.socket
 
 [Container]
-Image=ghcr.io/jack-turk-5/wireguard/wireguard-pro:latest
+Image=ghcr.io/jack-turk-5/wireguard/wireguard-pro:0.1.4
 ContainerName=wireguard-pro
 Network=pasta:--mtu,1500
 Volume=wg-keydata:/etc/wireguard:Z,U

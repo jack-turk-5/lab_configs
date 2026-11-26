@@ -4,3 +4,10 @@
     path: "~/.config/containers/systemd"
     state: directory
     mode: '0755'
+
+- name: Enable podman auto-update timer for user
+  ansible.builtin.systemd:
+    scope: user
+    name: podman-auto-update.timer
+    enabled: true
+    state: started

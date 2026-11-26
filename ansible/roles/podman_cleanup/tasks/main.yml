@@ -1,0 +1,25 @@
+---
+- name: Find images referenced by quadlet units
+  ansible.builtin.shell:
+    cmd: grep -h '^Image=' ~/.config/containers/systemd/*.container | cut -d= -f2-
+  register: quadlet_images
+  changed_when: false
+  failed_when: false
+
+- name: List local images
+  ansible.builtin.command:
+    cmd: podman images --format json
+  register: local_images
+  changed_when: false
+
+- name: Remove images not referenced by any quadlet unit
+  ansible.builtin.command:
+    cmd: "podman rmi {{ item.Id }}"
+  loop: "{{ local_images.stdout | from_json }}"
+  loop_control:
+    label: "{{ (item.Names | default(['<none>']))[0] }}"
+  when:
+    - item.Names | default([]) | intersect(quadlet_images.stdout_lines) | length == 0
+    - item.Names | default([]) | select('match', '^localhost/') | list | length == 0
+  register: rmi_result
+  failed_when: rmi_result.rc != 0 and 'in use' not in rmi_result.stderr
